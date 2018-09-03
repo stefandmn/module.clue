@@ -1,4 +1,6 @@
-v1.0
+v1.4
+- Drop requests library
 - Transform Commons library into structured module organized on functional area
 - Move mediadir library from service.clue add-on
 - Move Commons and requests libraries from service.clue add-on
+..
