@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import datetime
 import os
+import sys
+import datetime
 import sqlite3
 import time
 
@@ -23,6 +24,8 @@ class StorageData(object):
 		self._max_file_size_kb = max_file_size_kb
 		self._table_created = False
 		self._needs_commit = False
+		if sys.getrecursionlimit() < 100000:
+			sys.setrecursionlimit(100000)
 
 	def set_max_item_count(self, max_item_count):
 		self._max_item_count = max_item_count

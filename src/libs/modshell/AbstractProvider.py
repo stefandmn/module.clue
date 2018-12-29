@@ -23,7 +23,6 @@ class AbstractProvider(object):
 			method = getattr(self, method_name)
 			if hasattr(method, 'media_re_path'):
 				self.register_path(method.media_re_path, method_name)
-		pass
 
 	def getAlternativeFanart(self, context):
 		return context.getFanart()

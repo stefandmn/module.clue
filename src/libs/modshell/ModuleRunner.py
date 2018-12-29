@@ -2,9 +2,9 @@
 
 __all__ = ['run']
 
+import commons
 import platform
 import traceback
-import commons
 from modshell.impl.ShellRunner import ShellRunner as Runner
 from modshell.impl.ShellContext import ShellContext as Context
 
