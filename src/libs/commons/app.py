@@ -3,6 +3,7 @@
 from env import *
 import urllib2
 import sys
+import os
 
 if hasattr(sys.modules["__main__"], "xbmc"):
 	xbmc = sys.modules["__main__"].xbmc
@@ -90,8 +91,14 @@ def error(txt, code=""):
 
 
 def translate(id):
-	string = Addon().getLocalizedString(id).encode('utf-8', 'ignore')
-	return string
+	_value = Addon().getLocalizedString(id)
+	if _value is None or _value == '':
+		_value = xbmc.getLocalizedString(id)
+	if _value is not None and _value != '':
+		_value = _value.encode('utf-8', 'ignore')
+	else:
+		_value = ''
+	return _value
 
 
 def setting(id):
@@ -110,21 +117,28 @@ def setting(id):
 		return _value
 
 
-def getSetting(id):
-	return Addon().getSetting(id)
+def getAddonSetting(id):
+	_value = Addon().getSetting(id)
+	if _value is None:
+		_value = ''
+	else:
+		_value = str(_value).encode('utf-8', 'ignore')
+	return _value
 
 
-def setSetting(id, value):
-	if value is None:
-		value = ''
-	Addon().setSetting(id, value)
+def setAddonSetting(id, _value=None):
+	if _value is None:
+		_value = ''
+	else:
+		_value = str(_value).encode('utf-8', 'ignore')
+	Addon().setSetting(id, _value)
 
 
 def PasswordDialog():
 	pwd = ""
 	keyboard = xbmc.Keyboard("", AddonName() + "," + translate(32016), True)
 	keyboard.doModal()
-	if (keyboard.isConfirmed()):
+	if keyboard.isConfirmed():
 		pwd = keyboard.getText()
 	return pwd
 
@@ -256,12 +270,14 @@ def StringInputDialog(title=u"Input", default=u"", hidden=False):
 	# Fix for when this functions is called with default=None
 	if not default:
 		default = u""
+	else:
+		default = str(default).encode('utf-8', 'ignore')
 	try:
 		if isinstance(title, int):
 			code = int(title)
 			msg = translate(code)
 		else:
-			msg = title
+			msg = title.encode('utf-8', 'ignore')
 	except:
 		msg = title
 	keyboard = xbmc.Keyboard(default, msg)
@@ -274,8 +290,6 @@ def StringInputDialog(title=u"Input", default=u"", hidden=False):
 
 # This function raises a keyboard numpad for user input
 def NumberInputDialog(title=u"Input", default=u""):
-	result = None
-	# Fix for when this functions is called with default=None
 	if not default:
 		default = u""
 	try:
@@ -291,6 +305,17 @@ def NumberInputDialog(title=u"Input", default=u""):
 	return str(result)
 
 
+# Run builtin command implemented for GUI
+def RunBuiltinCommand(command, param=None, value=None):
+	if param is None and value is None:
+		xbmc.executebuiltin(command)
+	elif param is not None and value is None:
+		xbmc.executebuiltin(command + '(' + param + ')')
+	elif param is not None and value is not None:
+		xbmc.executebuiltin(command + '(' + param + ',' + str(value) + ')')
+	elif param is None and value is not None:
+		xbmc.executebuiltin(command + '(' + str(value) + ')')
+
 # Function: sleep
 def sleep(ms=1000):
 	xbmc.sleep(ms)
@@ -301,9 +326,60 @@ def restart():
 	xbmc.restart()
 
 
-# Function: getSpecialPath
-def getSpecialPath(path):
-	if path is not None and path.startswith("special://"):
-		return xbmc.translatePath(path)
+# Function: path
+def path(*paths):
+	if paths is not None and len(paths) > 0:
+		if str(paths[0]).startswith("special://"):
+			root = xbmc.translatePath(paths[0])
+			if len(paths) > 1:
+				return os.path.join(root, *paths[1:])
+			else:
+				return root
+		elif str(paths[0]).startswith("/"):
+			if len(paths) > 1:
+				return os.path.join(paths[0], *paths[1:])
+			else:
+				return paths[0]
+		else:
+			return os.path.join(AddonPath(), *paths)
 	else:
-		return path
+		return AddonPath()
+
+
+# Function: setSkinProperty
+def setSkinProperty(window, name, value=None):
+	if value is None:
+		value = ''
+	xbmcgui.Window(window).setProperty(name, str(value))
+
+
+# Function: getSkinProperty
+def getSkinProperty(window, name):
+	try:
+		if isinstance(window, int):
+			value = xbmc.getInfoLabel("Window(%i).Property(%s)" % (window, str(name)))
+		else:
+			value = xbmc.getInfoLabel("Window(%s).Property(%s)" % (str(window), str(name)))
+	except:
+		value = ''
+	return value
+
+
+# Function: setSkinConfiguration
+def setSkinSetting(name, value=None):
+	if value is not None:
+		if isinstance(value, str):
+			if value != "":
+				xbmc.executebuiltin('Skin.SetString(' + name + ', ' + str(value) + ')')
+			else:
+				xbmc.executebuiltin('Skin.Reset(' + name + ')')
+		elif isinstance(value, int) or isinstance(value, float):
+			xbmc.executebuiltin('Skin.SetString(' + name + ', ' + str(value) + ')')
+		elif isinstance(value, bool) and value == True:
+			xbmc.executebuiltin('Skin.SetBool(' + name + ')')
+		elif isinstance(value, bool) and value == False:
+			xbmc.executebuiltin('Skin.SetBool(' + name + ')')
+			xbmc.executebuiltin('Skin.ToggleSetting(' + name + ')')
+	else:
+		xbmc.executebuiltin('Skin.ToggleSetting(' + name + ')')
+
