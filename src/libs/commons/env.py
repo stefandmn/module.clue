@@ -93,6 +93,19 @@ def any2str(v, error=False, none=True):
 			raise RuntimeError("Invalid null value")
 
 
+#Function isempty
+def isempty(v):
+	if v is None:
+		return True
+	else:
+		if isinstance(v, str) and v == '':
+			return True
+		elif isinstance(v, bool):
+			return v
+		else:
+			return False
+
+
 # Function: procexec
 def procexec(cmd):
 	try:
