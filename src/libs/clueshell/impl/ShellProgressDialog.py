@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from modshell.AbstractProgressDialog import AbstractProgressDialog
+from clueshell.AbstractProgressDialog import AbstractProgressDialog
 
 if hasattr(sys.modules["__main__"], "xbmcgui"):
 	xbmcgui = sys.modules["__main__"].xbmcgui
@@ -28,7 +28,7 @@ class ShellProgressDialog(AbstractProgressDialog):
 	def update(self, steps=1, text=None):
 		self._position += steps
 		position = int(float(100.0 / self._total) * self._position)
-		if isinstance(text, basestring):
+		if isinstance(text, str):
 			self._dialog.update(position, text)
 		else:
 			self._dialog.update(position)

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from modshell.utils import DatetimeParser
-from modshell.items.ImageItem import ImageItem
-from modshell.items.AudioItem import AudioItem
-from modshell.items.VideoItem import VideoItem
+from clueshell.utils import DatetimeParser
+from clueshell.items.ImageItem import ImageItem
+from clueshell.items.AudioItem import AudioItem
+from clueshell.items.VideoItem import VideoItem
 
 
 def createFromItem(context, base_item):

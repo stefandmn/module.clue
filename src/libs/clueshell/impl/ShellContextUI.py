@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from modshell.utils.Utilities import to_unicode, to_utf8
-from modshell.AbstractContextUI import AbstractContextUI
+from clueshell.utils.Utilities import to_unicode, to_utf8
+from clueshell.AbstractContextUI import AbstractContextUI
 from .ShellProgressDialog import ShellProgressDialog
 from .ShellProgressDialogBG import ShellProgressDialogBG
 

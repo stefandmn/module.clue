@@ -5,8 +5,8 @@ __all__ = ['run']
 import commons
 import platform
 import traceback
-from modshell.impl.ShellRunner import ShellRunner as Runner
-from modshell.impl.ShellContext import ShellContext as Context
+from clueshell.impl.ShellRunner import ShellRunner as Runner
+from clueshell.impl.ShellContext import ShellContext as Context
 
 
 def run(provider, context=None):
@@ -18,7 +18,7 @@ def run(provider, context=None):
 		py_version = 'Python %s' % str(platform.python_version())
 		cx_version = context.getSystemVersion()
 		context.notice('Starting %s (%s) on %s with %s' % (context.getName(), context.getVersion(), cx_version, py_version))
-		context.debug('Execution details: path = %s, parameters = %s' %(context.getPath(), unicode(context.getParams())))
+		context.debug('Execution details: path = %s, parameters = %s' %(context.getPath(), str(context.getParams())))
 		# Run provider
 		runner.run(provider, context)
 		context.debug('Shutting down module shell..')

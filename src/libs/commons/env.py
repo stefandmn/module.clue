@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import app
+from commons.app import debug, error
 import subprocess
 
 
@@ -11,7 +11,7 @@ def any2bool(v, error=False, none=True):
 			return v
 		elif isinstance(v, int):
 			return True if v > 0 else False
-		elif isinstance(v, str) or isinstance(v, basestring):
+		elif isinstance(v, str):
 			if v.lower() in ("on", "yes", "true", "0"):
 				return True
 			elif v.lower() in ("off", "no", "false", "1"):
@@ -110,21 +110,21 @@ def isempty(v):
 def procexec(cmd):
 	try:
 		if isinstance(cmd, list):
-			app.debug("Preparing command for execution: %s" % (" ".join(cmd)), "commons")
+			debug("Preparing command for execution: %s" % (" ".join(cmd)), "commons")
 			_output = subprocess.check_output(cmd)
 		else:
-			app.debug("Preparing command for execution: %s" % cmd)
+			debug("Preparing command for execution: %s" % cmd)
 			_output = subprocess.check_output(cmd, shell=True)
 		_status = True
 		if _output is not None:
 			_output = _output.strip()
-		app.debug("Command execution output: [%s] %s" % (str(_status), _output))
+		debug("Command execution output: [%s] %s" % (str(_status), _output))
 	except subprocess.CalledProcessError as grepexc:
-		app.error("Exception while executing shell command: [%s] %s" % (grepexc.returncode, grepexc.output))
+		error("Exception while executing shell command: [%s] %s" % (grepexc.returncode, grepexc.output))
 		_status = False
 		_output = str(grepexc.output)
 	except BaseException as err:
-		app.error("Exception while executing shell command: %s" % str(err))
+		error("Exception while executing shell command: %s" % str(err))
 		_status = False
 		_output = str(err)
 	return _status, _output

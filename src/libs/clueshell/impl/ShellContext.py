@@ -7,8 +7,8 @@ import urlparse
 import weakref
 import datetime
 import commons
-from modshell.utils.Utilities import to_unicode
-from modshell.AbstractContext import AbstractContext
+from clueshell.utils.Utilities import to_unicode
+from clueshell.AbstractContext import AbstractContext
 from .ShellSettings import ShellSettings
 from .ShellContextUI import ShellContextUI
 from .ShellVersion import ShellVersion
@@ -100,7 +100,7 @@ class ShellContext(AbstractContext):
 		try:
 			language = xbmc.getLanguage(0, region=True)
 			return language[0].lower()
-		except Exception, ex:
+		except Exception as ex:
 			self.error('Failed to get system language (%s)' %str(ex))
 			return 'en-US'
 		pass
@@ -111,7 +111,7 @@ class ShellContext(AbstractContext):
 		try:
 			language = xbmc.getLanguage(0, region=True)
 			return language[0].upper()
-		except Exception, ex:
+		except Exception as ex:
 			self.error('Failed to get system region (%s)' %str(ex))
 			return 'US'
 		pass

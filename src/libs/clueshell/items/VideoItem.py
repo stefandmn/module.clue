@@ -40,19 +40,19 @@ class VideoItem(BaseItem):
 	def addArtist(self, artist):
 		if self._artist is None:
 			self._artist = []
-		self._artist.append(unicode(artist))
+		self._artist.append(str(artist))
 
 	def getArtist(self):
 		return self._artist
 
 	def setStudio(self, studio):
-		self._studio = unicode(studio)
+		self._studio = str(studio)
 
 	def getStudio(self):
 		return self._studio
 
 	def setTitle(self, title):
-		self._title = unicode(title)
+		self._title = str(title)
 		self._name = self._title
 
 	def getTitle(self):
@@ -88,7 +88,7 @@ class VideoItem(BaseItem):
 		return self._premiered
 
 	def setPlot(self, plot):
-		self._plot = unicode(plot)
+		self._plot = str(plot)
 
 	def getPlot(self):
 		return self._plot
@@ -100,7 +100,7 @@ class VideoItem(BaseItem):
 		return self._rating
 
 	def setDirector(self, director_name):
-		self._director = unicode(director_name)
+		self._director = str(director_name)
 
 	def getDirector(self):
 		return self._director
@@ -163,7 +163,7 @@ class VideoItem(BaseItem):
 		return self._aired
 
 	def setGenre(self, genre):
-		self._genre = unicode(genre)
+		self._genre = str(genre)
 		pass
 
 	def getGenre(self):

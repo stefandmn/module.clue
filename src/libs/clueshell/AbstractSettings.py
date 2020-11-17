@@ -25,7 +25,7 @@ class AbstractSettings(object):
 			return default_value
 		try:
 			return converter(int(value))
-		except Exception, ex:
+		except Exception as ex:
 			commons.error("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())
 		return default_value
 

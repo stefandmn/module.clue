@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from modshell.AbstractSettings import AbstractSettings
+from clueshell.AbstractSettings import AbstractSettings
 
 
 class ShellSettings(AbstractSettings):

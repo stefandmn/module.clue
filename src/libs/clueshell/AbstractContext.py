@@ -3,12 +3,12 @@
 import os
 import urllib
 import commons
-from modshell.utils.Utilities import *
-from modshell.utils.FunctionCache import FunctionCache
-from modshell.utils.SearchHistory import SearchHistory
-from modshell.utils.FavoriteList import FavoriteList
-from modshell.utils.WatchLaterList import WatchLaterList
-from modshell.utils.AccessManager import AccessManager
+from clueshell.utils.Utilities import *
+from clueshell.utils.FunctionCache import FunctionCache
+from clueshell.utils.SearchHistory import SearchHistory
+from clueshell.utils.FavoriteList import FavoriteList
+from clueshell.utils.WatchLaterList import WatchLaterList
+from clueshell.utils.AccessManager import AccessManager
 
 
 class AbstractContext(object):
@@ -22,7 +22,7 @@ class AbstractContext(object):
 		self._favorite_list = None
 		self._watch_later_list = None
 		self._access_manager = None
-		self._plugin_name = unicode(plugin_name)
+		self._plugin_name = str(plugin_name)
 		self._version = 'UNKNOWN'
 		self._plugin_id = plugin_id
 		self._path = createPath(path)

@@ -23,25 +23,25 @@ class AudioItem(BaseItem):
 		return self._rating
 
 	def setTitle(self, title):
-		self._title = unicode(title)
+		self._title = str(title)
 
 	def getTitle(self):
 		return self._title
 
 	def setArtistName(self, artist_name):
-		self._artist = unicode(artist_name)
+		self._artist = str(artist_name)
 
 	def getArtistName(self):
 		return self._artist
 
 	def setAlbumName(self, album_name):
-		self._album = unicode(album_name)
+		self._album = str(album_name)
 
 	def getAlbumName(self):
 		return self._album
 
 	def setGenre(self, genre):
-		self._genre = unicode(genre)
+		self._genre = str(genre)
 
 	def getGenre(self):
 		return self._genre

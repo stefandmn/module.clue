@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import xbmcgui
-from modshell.utils import InfoLabels
-from modshell.items.VideoItem import VideoItem
-from modshell.items.AudioItem import AudioItem
-from modshell.items.UriItem import UriItem
+from clueshell.utils import InfoLabels
+from clueshell.items.VideoItem import VideoItem
+from clueshell.items.AudioItem import AudioItem
+from clueshell.items.UriItem import UriItem
 
 
 def to_video_item(context, video_item):

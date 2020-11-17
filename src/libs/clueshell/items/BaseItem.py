@@ -11,7 +11,7 @@ class BaseItem(object):
 
 	def __init__(self, name, uri, image=u'', fanart=u''):
 		self._version = BaseItem.VERSION
-		self._name = unicode(name)
+		self._name = str(name)
 		self._uri = str(uri)
 		self._image = u''
 		self.setImage(image)
@@ -21,7 +21,7 @@ class BaseItem(object):
 		self._date = None
 
 	def __str__(self):
-		return unicode(self).encode('utf-8')
+		return str(self).encode('utf-8')
 
 	def __unicode__(self):
 		name = self._name

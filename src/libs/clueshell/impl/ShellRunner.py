@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from modshell.AbstractRunner import AbstractRunner
-from modshell.ModuleException import ModuleException
-from modshell.items.DirectoryItem import DirectoryItem
-from modshell.items.VideoItem import VideoItem
-from modshell.items.AudioItem import AudioItem
-from modshell.items.ImageItem import ImageItem
-from modshell.items.UriItem import UriItem
-from modshell import AbstractProvider
-from modshell.utils import MediaItems, InfoLabels
+from clueshell.AbstractRunner import AbstractRunner
+from clueshell.ModuleException import ModuleException
+from clueshell.items.DirectoryItem import DirectoryItem
+from clueshell.items.VideoItem import VideoItem
+from clueshell.items.AudioItem import AudioItem
+from clueshell.items.ImageItem import ImageItem
+from clueshell.items.UriItem import UriItem
+from clueshell import AbstractProvider
+from clueshell.utils import MediaItems, InfoLabels
 
 if hasattr(sys.modules["__main__"], "xbmcgui"):
 	xbmcgui = sys.modules["__main__"].xbmcgui

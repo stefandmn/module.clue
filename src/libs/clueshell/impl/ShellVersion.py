@@ -2,7 +2,7 @@
 
 import sys
 import json
-from modshell.AbstractSystemVersion import AbstractSystemVersion
+from clueshell.AbstractSystemVersion import AbstractSystemVersion
 
 if hasattr(sys.modules["__main__"], "xbmc"):
 	xbmc = sys.modules["__main__"].xbmc
@@ -16,7 +16,6 @@ class ShellVersion(AbstractSystemVersion):
 		super(ShellVersion, self).__init__(version, releasename, appname)
 		try:
 			json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }')
-			json_query = unicode(json_query, 'utf-8', errors='ignore')
 			json_query = json.loads(json_query)
 			result = json_query['result']['version']
 			self._version = (result.get('major', 1), result.get('minor', 0))

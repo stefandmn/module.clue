@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import json
-from modshell.items.VideoItem import VideoItem
-from modshell.items.DirectoryItem import DirectoryItem
-from modshell.items.AudioItem import AudioItem
-from modshell.items.ImageItem import ImageItem
+from clueshell.items.VideoItem import VideoItem
+from clueshell.items.DirectoryItem import DirectoryItem
+from clueshell.items.AudioItem import AudioItem
+from clueshell.items.ImageItem import ImageItem
 
 
 def from_json(json_data):
@@ -31,7 +31,7 @@ def from_json(json_data):
 			if hasattr(item, key):
 				setattr(item, key, data[key])
 		return item
-	if isinstance(json_data, basestring):
+	if isinstance(json_data, str):
 		json_data = json.loads(json_data)
 	# get output from inner function
 	return _from_json(json_data)

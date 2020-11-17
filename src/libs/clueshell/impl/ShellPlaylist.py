@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from modshell.AbstractPlaylist import AbstractPlaylist
-from modshell.utils import MediaItems
+from clueshell.AbstractPlaylist import AbstractPlaylist
+from clueshell.utils import MediaItems
 
 if hasattr(sys.modules["__main__"], "xbmc"):
 	xbmc = sys.modules["__main__"].xbmc

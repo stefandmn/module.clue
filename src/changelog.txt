@@ -1,3 +1,7 @@
+v2.0
+_ Adapt the entire library for Python 3
+- Rename modshell package to clueshell
+
 v1.4
 - Drop requests library
 - Transform Commons library into structured module organized on functional area

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from modshell.AbstractPlayer import AbstractPlayer
+from clueshell.AbstractPlayer import AbstractPlayer
 
 if hasattr(sys.modules["__main__"], "xbmc"):
 	xbmc = sys.modules["__main__"].xbmc

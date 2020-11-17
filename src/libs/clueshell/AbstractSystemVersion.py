@@ -8,18 +8,18 @@ class AbstractSystemVersion(object):
 			self._version = (0, 0, 0, 0)
 		else:
 			self._version = version
-		if not releasename or not isinstance(releasename, basestring):
+		if not releasename or not isinstance(releasename, str):
 			self._releasename = 'UNKNOWN'
 		else:
 			self._releasename = releasename
-		if not appname or not isinstance(appname, basestring):
+		if not appname or not isinstance(appname, str):
 			self._appname = 'UNKNOWN'
 		else:
 			self._appname = appname
 		pass
 
 	def __str__(self):
-		return unicode(self).encode('utf-8')
+		return str(self).encode('utf-8')
 
 	def __unicode__(self):
 		obj_str = "%s (%s-%s)" % (self._releasename, self._appname, '.'.join(map(str, self._version)))

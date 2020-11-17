@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import re
-import utils.ItemCast as items
+from .utils.ItemCast import from_json, to_jsons, DirectoryItem
 from .ModuleException import ModuleException
-from items.SearchHistoryItem import SearchHistoryItem
-from items.NewSearchItem import NewSearchItem
+from .items.SearchHistoryItem import SearchHistoryItem
+from .items.NewSearchItem import NewSearchItem
 
 
 class AbstractProvider(object):
@@ -88,16 +88,16 @@ class AbstractProvider(object):
 		params = context.getParams()
 		command = re_match.group('command')
 		if command == 'add':
-			fav_item = items.from_json(params['item'])
+			fav_item = from_json(params['item'])
 			context.getFavoriteList().add(fav_item)
 		elif command == 'remove':
-			fav_item = items.from_json(params['item'])
+			fav_item = from_json(params['item'])
 			context.getFavoriteList().remove(fav_item)
 			context.getUI().refreshContainer()
 		elif command == 'list':
 			directory_items = context.getFavoriteList().list()
 			for directory_item in directory_items:
-				context_menu = [(context.localize(30904, "Remove"), 'RunPlugin(%s)' % context.createUri(['media/favorites', 'remove'], params={'item': items.to_jsons(directory_item)}))]
+				context_menu = [(context.localize(30904, "Remove"), 'RunPlugin(%s)' % context.createUri(['media/favorites', 'remove'], params={'item': to_jsons(directory_item)}))]
 				directory_item.setContextMenu(context_menu)
 			return directory_items
 		else:
@@ -109,16 +109,16 @@ class AbstractProvider(object):
 		params = context.getParams()
 		command = re_match.group('command')
 		if command == 'add':
-			item = items.from_json(params['item'])
+			item = from_json(params['item'])
 			context.getWatchLaterList().add(item)
 		elif command == 'remove':
-			item = items.from_json(params['item'])
+			item = from_json(params['item'])
 			context.getWatchLaterList().remove(item)
 			context.getUI().refreshContainer()
 		elif command == 'list':
 			video_items = context.getWatchLaterList().list()
 			for video_item in video_items:
-				context_menu = [(context.localize(30904, "Remove"), 'RunPlugin(%s)' % context.createUri(['media/watch_later', 'remove'], params={'item': items.to_jsons(video_item)}))]
+				context_menu = [(context.localize(30904, "Remove"), 'RunPlugin(%s)' % context.createUri(['media/watch_later', 'remove'], params={'item': to_jsons(video_item)}))]
 				video_item.setContextMenu(context_menu)
 			return video_items
 		else:
@@ -201,7 +201,7 @@ class AbstractProvider(object):
 			result.append(new_search_item)
 			for search in search_history.list():
 				# little fallback for old history entries
-				if isinstance(search, items.DirectoryItem):
+				if isinstance(search, DirectoryItem):
 					search = search.getName()
 					pass
 				# we create a new instance of the SearchItem

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from env import *
+from commons.env import *
 import urllib2
 import sys
 import os

@@ -3,15 +3,10 @@
 from .BaseItem import BaseItem
 
 
-class ImageItem(BaseItem):
+class DirectoryItem(BaseItem):
 
 	def __init__(self, name, uri, image=u'', fanart=u''):
 		BaseItem.__init__(self, name, uri, image, fanart)
-		self._title = None
 
-	def setTitle(self, title):
-		self._title = unicode(title)
-
-	def getTitle(self):
-		return self._title
-
+	def setName(self, name):
+		self._name = str(name)
