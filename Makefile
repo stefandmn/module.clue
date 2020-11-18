@@ -66,10 +66,10 @@ ifeq ($(shell [[ -d $(ROOT)/$(SRCDIR) ]] && echo -n yes),yes)
 	/usr/bin/rsync -a -zvh --progress --delete -e ssh $(ROOT)/$(SRCDIR)/ root@$(RPIHOST):/clue/.kodi/addons/$(NAME)
 endif
 else
-	echo "For testing process you have to set TESTLOCATION variable to test on any Kodi\
+	echo "For testing process you have to set TESTPATH variable to test on any Kodi\
 	environment (syncronized over rsync with ssh) or RPIHOST variable to test on a RPi\
 	device. Test process suppose to synchronize only sourse files, system files can be\
-	tested using 'deply' target - only on RPi devices!"
+	tested using 'deploy' target - only on RPi devices!"
 endif
 endif
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="module.clue" version="2.0.0" name="Clue Module" provider-name="AMSD">
+<addon id="module.clue" version="2.0.1" name="Clue Module" provider-name="AMSD">
 	<requires>
-		<import addon="xbmc.python" version="2.20.0"/>
+		<import addon="xbmc.python" version="2.25.0"/>
 	</requires>
 	<extension point="xbmc.python.module" library="libs"/>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en">Clue Standard Libraries for MCPi</summary>
-		<description lang="en">Clue Module provides common APIs and libraries used within Clue Repository</description>
+		<summary lang="en">Clue Libraries for Kodi</summary>
+		<description lang="en">Clue Module provides common APIs and libraries used by most of Clue addons</description>
 	</extension>
 </addon>

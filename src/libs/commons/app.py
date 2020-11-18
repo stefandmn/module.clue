@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from commons.env import *
-import urllib2
 import sys
 import os
 
@@ -17,9 +16,6 @@ if hasattr(sys.modules["__main__"], "xbmcaddon"):
 	xbmcaddon = sys.modules["__main__"].xbmcaddon
 else:
 	import xbmcaddon
-
-if hasattr(sys.modules["__main__"], "opener"):
-	urllib2.install_opener(sys.modules["__main__"].opener)
 
 
 def Addon():

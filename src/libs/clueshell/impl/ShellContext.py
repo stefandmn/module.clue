@@ -3,7 +3,6 @@
 import sys
 import json
 import urllib
-import urlparse
 import weakref
 import datetime
 import commons
@@ -48,7 +47,7 @@ class ShellContext(AbstractContext):
 		# first the path of the uri
 		if override:
 			self._uri = sys.argv[0]
-			comps = urlparse.urlparse(self._uri)
+			comps = urllib.parse.urlparse(self._uri)
 			self._path = urllib.unquote(comps.path).decode('utf-8')
 
 			# after that try to get the params
@@ -57,7 +56,7 @@ class ShellContext(AbstractContext):
 				if len(params) > 0:
 					self._uri = self._uri + '?' + params
 					self._params = {}
-					params = dict(urlparse.parse_qsl(params))
+					params = dict(urllib.parse.parse_qsl(params))
 					for _param in params:
 						item = params[_param]
 						self._params[_param] = item.decode('utf-8')

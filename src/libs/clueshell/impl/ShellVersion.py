@@ -38,3 +38,5 @@ class ShellVersion(AbstractSystemVersion):
 			self._releasename = 'Krypton'
 		if self._version >= (18, 0):
 			self._releasename = 'Leia'
+		if self._version >= (19, 0):
+			self._releasename = 'Matrix'

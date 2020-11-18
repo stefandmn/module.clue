@@ -1,4 +1,6 @@
 v2.0
+- Replace urlparse by urllib.parser library
+- Update module icon (to become the template for all Python modules)
 _ Adapt the entire library for Python 3
 - Rename modshell package to clueshell
 
