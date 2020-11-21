@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from commons.env import *
+from .env import *
 import sys
 import os
 

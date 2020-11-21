@@ -2,7 +2,7 @@
 
 import os
 import urllib
-import commons
+import common
 from clueshell.utils.Utilities import *
 from clueshell.utils.FunctionCache import FunctionCache
 from clueshell.utils.SearchHistory import SearchHistory
@@ -171,19 +171,19 @@ class AbstractContext(object):
 		raise NotImplementedError()
 
 	def warn(self, text):
-		commons.warn(text)
+		common.warn(text)
 
 	def error(self, text):
-		commons.error(text)
+		common.error(text)
 
 	def notice(self, text):
-		commons.notice(text)
+		common.notice(text)
 
 	def debug(self, text):
-		commons.debug(text)
+		common.debug(text)
 
 	def info(self, text):
-		commons.info(text)
+		common.info(text)
 
 	def clone(self, new_path=None, new_params=None):
 		raise NotImplementedError()

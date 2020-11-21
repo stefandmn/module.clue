@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from commons.app import debug, error
+from .app import debug, error
 import subprocess
 
 

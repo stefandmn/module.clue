@@ -5,7 +5,7 @@ import json
 import urllib
 import weakref
 import datetime
-import commons
+import common
 from clueshell.utils.Utilities import to_unicode
 from clueshell.AbstractContext import AbstractContext
 from .ShellSettings import ShellSettings
@@ -207,7 +207,7 @@ class ShellContext(AbstractContext):
 		except KeyError:
 			message = response['error']['message']
 			code = response['error']['code']
-			commons.debug('Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code))
+			common.debug('Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code))
 			return False
 
 	def setAddonEnabled(self, addon_id, enabled=True):
@@ -218,5 +218,5 @@ class ShellContext(AbstractContext):
 		except KeyError:
 			message = response['error']['message']
 			code = response['error']['code']
-			commons.debug('Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code))
+			common.debug('Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code))
 			return False

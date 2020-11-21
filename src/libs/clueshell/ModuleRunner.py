@@ -2,7 +2,7 @@
 
 __all__ = ['run']
 
-import commons
+import common
 import platform
 import traceback
 from clueshell.impl.ShellRunner import ShellRunner as Runner
@@ -24,10 +24,10 @@ def run(provider, context=None):
 		context.debug('Shutting down module shell..')
 	except BaseException as bex:
 		traceback.print_exc()
-		commons.error("Error running module shell: " + str(bex))
+		common.error("Error running module shell: " + str(bex))
 		if context is not None:
 			context.getUI().closeBusyDialog()
 			context.getUI().onOk(context.getName(), "Error in module shell: " + str(bex))
 		else:
-			commons.OkDialog("Error in module shell: " + str(bex))
+			common.OkDialog("Error in module shell: " + str(bex))
 	pass
