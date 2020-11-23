@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from .app import debug, error
+import common
+import urllib3
+import certifi
 import subprocess
 
 
@@ -110,21 +112,39 @@ def isempty(v):
 def procexec(cmd):
 	try:
 		if isinstance(cmd, list):
-			debug("Preparing command for execution: %s" % (" ".join(cmd)), "commons")
+			common.debug("Preparing command for execution: %s" % (" ".join(cmd)), "commons")
 			_output = subprocess.check_output(cmd)
 		else:
-			debug("Preparing command for execution: %s" % cmd)
+			common.debug("Preparing command for execution: %s" % cmd)
 			_output = subprocess.check_output(cmd, shell=True)
 		_status = True
 		if _output is not None:
 			_output = _output.strip()
-		debug("Command execution output: [%s] %s" % (str(_status), _output))
+		common.debug("Command execution output: [%s] %s" % (str(_status), _output))
 	except subprocess.CalledProcessError as grepexc:
-		error("Exception while executing shell command: [%s] %s" % (grepexc.returncode, grepexc.output))
+		common.error("Exception while executing shell command: [%s] %s" % (grepexc.returncode, grepexc.output))
 		_status = False
 		_output = str(grepexc.output)
 	except BaseException as err:
-		error("Exception while executing shell command: %s" % str(err))
+		common.error("Exception while executing shell command: %s" % str(err))
 		_status = False
 		_output = str(err)
 	return _status, _output
+
+
+# Function: urlcall
+def urlcall(url, method='GET', payload=None):
+	common.debug("Calling URL: %s" % url)
+	http = urllib3.PoolManager()
+	if str(url).lower().startswith("htts://"):
+		http = urllib3.PoolManager(ca_certs=certifi.where())
+	if method is None or (method != "GET" and method != "POST"):
+		method = "GET"
+	try:
+		req = http.request(method, url, fields=payload)
+		response = req.data
+		req.close()
+	except BaseException as err:
+		common.error("Exception while executing shell command: %s" % str(err))
+		response = None
+	return response

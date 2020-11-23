@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .env import *
-import sys
 import os
+import sys
+import common
+
 
 if hasattr(sys.modules["__main__"], "xbmc"):
 	xbmc = sys.modules["__main__"].xbmc
@@ -62,7 +63,7 @@ def log(txt, code="", level=0):
 
 
 def trace(txt, code=""):
-	if any2bool(setting('debug')):
+	if common.any2bool(setting('debug')):
 		log(txt, code, xbmc.LOGDEBUG)
 
 
