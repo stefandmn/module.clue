@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 import common
 import urllib3
 import certifi
@@ -108,6 +109,17 @@ def isempty(v):
 			return False
 
 
+#Function utf8
+def utf8(v):
+	if v is not None:
+		if sys.version_info[0] == 2:
+			return v.encode('utf-8')
+		else:
+			return str(v)
+	else:
+		return v
+
+
 # Function: procexec
 def procexec(cmd):
 	try:
@@ -133,18 +145,24 @@ def procexec(cmd):
 
 
 # Function: urlcall
-def urlcall(url, method='GET', payload=None):
+def urlcall(url, method='GET', payload=None, thrown=False):
 	common.debug("Calling URL: %s" % url)
 	http = urllib3.PoolManager()
 	if str(url).lower().startswith("htts://"):
 		http = urllib3.PoolManager(ca_certs=certifi.where())
 	if method is None or (method != "GET" and method != "POST"):
 		method = "GET"
-	try:
+	if not thrown:
+		try:
+			req = http.request(method, url, fields=payload)
+			response = req.data
+			req.close()
+		except BaseException as err:
+			common.error("Exception while executing shell command: %s" % str(err))
+			response = None
+		return response
+	else:
 		req = http.request(method, url, fields=payload)
 		response = req.data
 		req.close()
-	except BaseException as err:
-		common.error("Exception while executing shell command: %s" % str(err))
-		response = None
-	return response
+		return response
