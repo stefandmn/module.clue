@@ -48,18 +48,16 @@ def AddonProfile():
 
 
 def log(txt, code="", level=0):
-	if isinstance(txt, str):
-		txt = txt.decode("utf-8")
 	if not code:
 		msgid = "%s" % AddonId()
 	else:
 		msgid = "%s [%s]" % (AddonId(), code)
 	try:
 		message = u"%s: %s" % (msgid, txt)
-		xbmc.log(message.encode("utf-8"), level)
+		xbmc.log(message, level)
 	except:
 		message = u"%s: %s" % (msgid, repr(txt))
-		xbmc.log(message.encode("utf-8"), level)
+		xbmc.log(message, level)
 
 
 def trace(txt, code=""):
@@ -92,7 +90,7 @@ def translate(id):
 	if _value is None or _value == '':
 		_value = xbmc.getLocalizedString(id)
 	if _value is not None and _value != '':
-		_value = _value.encode('utf-8', 'ignore')
+		_value = common.utf8(_value)
 	else:
 		_value = ''
 	return _value
@@ -118,16 +116,12 @@ def getAddonSetting(id):
 	_value = Addon().getSetting(id)
 	if _value is None:
 		_value = ''
-	else:
-		_value = str(_value).encode('utf-8', 'ignore')
 	return _value
 
 
 def setAddonSetting(id, _value=None):
 	if _value is None:
 		_value = ''
-	else:
-		_value = str(_value).encode('utf-8', 'ignore')
 	Addon().setSetting(id, _value)
 
 
@@ -262,19 +256,17 @@ def SelectDialog(line='', options=None):
 
 
 # This function raises a keyboard for user input
-def StringInputDialog(title=u"Input", default=u"", hidden=False):
+def StringInputDialog(title="Input", default="", hidden=False):
 	result = None
 	# Fix for when this functions is called with default=None
 	if not default:
-		default = u""
-	else:
-		default = str(default).encode('utf-8', 'ignore')
+		default = ""
 	try:
 		if isinstance(title, int):
 			code = int(title)
 			msg = translate(code)
 		else:
-			msg = title.encode('utf-8', 'ignore')
+			msg = title
 	except:
 		msg = title
 	keyboard = xbmc.Keyboard(default, msg)
@@ -286,9 +278,9 @@ def StringInputDialog(title=u"Input", default=u"", hidden=False):
 
 
 # This function raises a keyboard numpad for user input
-def NumberInputDialog(title=u"Input", default=u""):
+def NumberInputDialog(title="Input", default=""):
 	if not default:
-		default = u""
+		default = ""
 	try:
 		if isinstance(title, int):
 			code = int(title)
