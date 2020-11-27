@@ -3,7 +3,6 @@
 import sys
 import common
 import urllib3
-import certifi
 import subprocess
 
 
@@ -153,8 +152,6 @@ def procexec(cmd):
 def urlcall(url, method='GET', payload=None, thrown=False):
 	common.debug("Calling URL: %s" % url)
 	http = urllib3.PoolManager()
-	if str(url).lower().startswith("htts://"):
-		http = urllib3.PoolManager(ca_certs=certifi.where())
 	if method is None or (method != "GET" and method != "POST"):
 		method = "GET"
 	if not thrown:
