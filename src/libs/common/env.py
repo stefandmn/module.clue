@@ -135,7 +135,7 @@ def procexec(cmd):
 		_status = False
 		_output = str(grepexc.output)
 	except BaseException as err:
-		common.error("Exception while executing shell command: %s" % str(err))
+		common.error("Error while executing shell command: %s" % str(err))
 		_status = False
 		_output = str(err)
 	return _status, _output
@@ -158,7 +158,7 @@ def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=
 			response = request.data
 			request.close()
 		except BaseException as err:
-			common.error("Exception while executing shell command: %s" % str(err))
+			common.error("Error while executing HTTP request: %s" % str(err))
 			response = None
 		return response
 	else:
