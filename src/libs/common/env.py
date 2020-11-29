@@ -142,22 +142,30 @@ def procexec(cmd):
 
 
 # Function: urlcall
-def urlcall(url, method='GET', payload=None, thrown=False):
+def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=3, certver=True, showerr=False):
 	common.debug("Calling URL: %s" % url)
 	http = urllib3.PoolManager()
-	if method is None or (method != "GET" and method != "POST"):
+	if certver is False:
+		http = urllib3.PoolManager(cert_reqs = 'CERT_NONE')
+	if method is None:
 		method = "GET"
-	if not thrown:
+	if not showerr:
 		try:
-			req = http.request(method, url, fields=payload)
-			response = req.data
-			req.close()
+			if timeout is not None and timeout > 0.0:
+				request = http.request(method, url, fields=fields, headers=headers, timeout=timeout, retries=retries)
+			else:
+				request = http.request(method, url, fields=fields, headers=headers, retries=retries)
+			response = request.data
+			request.close()
 		except BaseException as err:
 			common.error("Exception while executing shell command: %s" % str(err))
 			response = None
 		return response
 	else:
-		req = http.request(method, url, fields=payload)
-		response = req.data
-		req.close()
+		if timeout is not None and timeout > 0.0:
+			request = http.request(method, url, fields=fields, headers=headers, timeout=timeout, retries=retries)
+		else:
+			request = http.request(method, url, fields=fields, headers=headers, retries=retries)
+		response = request.data
+		request.close()
 		return response
