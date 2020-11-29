@@ -112,13 +112,6 @@ def isempty(v):
 def utf8(v):
 	if v is not None:
 		if sys.version_info[0] == 2:
-			if isinstance(v, str):
-				return unicode(v).encode('utf-8', 'ignore')
-			elif isinstance(v, unicode):
-				return v.encode('utf-8', 'ignore')
-			else:
-				return unicode(str(v)).encode('utf-8', 'ignore')
-		else:
 			return str(v).encode('utf-8', 'ignore')
 	else:
 		return v
