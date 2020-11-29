@@ -149,23 +149,17 @@ def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=
 		http = urllib3.PoolManager(cert_reqs = 'CERT_NONE')
 	if method is None:
 		method = "GET"
-	if not showerr:
-		try:
-			if timeout is not None and timeout > 0.0:
-				request = http.request(method, url, fields=fields, headers=headers, timeout=timeout, retries=retries)
-			else:
-				request = http.request(method, url, fields=fields, headers=headers, retries=retries)
-			response = request.data
-			request.close()
-		except BaseException as err:
-			common.error("Error while executing HTTP request: %s" % str(err))
-			response = None
-		return response
-	else:
+	try:
 		if timeout is not None and timeout > 0.0:
 			request = http.request(method, url, fields=fields, headers=headers, timeout=timeout, retries=retries)
 		else:
 			request = http.request(method, url, fields=fields, headers=headers, retries=retries)
 		response = request.data
 		request.close()
-		return response
+	except BaseException as err:
+		response = None
+		if not showerr:
+			common.error("Error while executing HTTP request: %s" % str(err))
+		else:
+			raise err
+	return response

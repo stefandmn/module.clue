@@ -61,12 +61,19 @@ def log(txt, code="", level=0):
 
 
 def trace(txt, code=""):
-	if common.any2bool(setting('debug')):
-		log(txt, code, xbmc.LOGDEBUG)
+	if code is None or code == '':
+		code = "TRACE"
+	else:
+		code = "%s - %s" %("TRACE", code)
+	if common.any2bool(setting('trace')):
+		debug(txt, code)
 
 
 def debug(txt, code=""):
-	log(txt, code, xbmc.LOGDEBUG)
+	if common.any2bool(setting('debug')):
+		log(txt, code, xbmc.LOGNOTICE)
+	else:
+		log(txt, code, xbmc.LOGDEBUG)
 
 
 def info(txt, code=""):
