@@ -19,32 +19,32 @@ else:
 	import xbmcaddon
 
 
-def Addon():
-	return xbmcaddon.Addon()
+def Addon(code=None):
+	return xbmcaddon.Addon(code)
 
 
-def AddonId():
-	return Addon().getAddonInfo('id')
+def AddonId(code=None):
+	return Addon(code).getAddonInfo('id')
 
 
-def AddonName():
-	return Addon().getAddonInfo('name')
+def AddonName(code=None):
+	return Addon(code).getAddonInfo('name')
 
 
-def AddonIcon():
-	return Addon().getAddonInfo('icon')
+def AddonIcon(code=None):
+	return Addon(code).getAddonInfo('icon')
 
 
-def AddonPath():
-	return Addon().getAddonInfo('path')
+def AddonPath(code=None):
+	return Addon(code).getAddonInfo('path')
 
 
-def AddonVersion():
-	return Addon().getAddonInfo('version')
+def AddonVersion(code=None):
+	return Addon(code).getAddonInfo('version')
 
 
-def AddonProfile():
-	return Addon().getAddonInfo('profile')
+def AddonProfile(code=None):
+	return Addon(code).getAddonInfo('profile')
 
 
 def log(txt, code="", level=0):
@@ -103,8 +103,8 @@ def translate(id):
 	return _value
 
 
-def setting(id):
-	_value = Addon().getSetting(id)
+def setting(id, code=None):
+	_value = Addon(code).getSetting(id)
 	if _value is not None and _value.lower() == "true":
 		return True
 	elif _value is not None and _value.lower() == "false":
@@ -119,17 +119,17 @@ def setting(id):
 		return _value
 
 
-def getAddonSetting(id):
-	_value = Addon().getSetting(id)
+def getAddonSetting(id, code=None):
+	_value = Addon(code).getSetting(id)
 	if _value is None:
 		_value = ''
 	return _value
 
 
-def setAddonSetting(id, _value=None):
+def setAddonSetting(id, _value=None, code=None):
 	if _value is None:
 		_value = ''
-	Addon().setSetting(id, _value)
+	Addon(code).setSetting(id, _value)
 
 
 def PasswordDialog():
@@ -312,6 +312,7 @@ def RunBuiltinCommand(command, param=None, value=None):
 	elif param is None and value is not None:
 		xbmc.executebuiltin(command + '(' + str(value) + ')')
 
+
 # Function: sleep
 def sleep(ms=1000):
 	xbmc.sleep(ms)
@@ -379,3 +380,10 @@ def setSkinSetting(name, value=None):
 	else:
 		xbmc.executebuiltin('Skin.ToggleSetting(' + name + ')')
 
+
+# Function: callJSON
+def callJSON(request):
+	response = None
+	if request is not None and request != '':
+		response = xbmc.executeJSONRPC(request)
+	return response
