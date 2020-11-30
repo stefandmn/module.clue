@@ -20,7 +20,10 @@ else:
 
 
 def Addon(code=None):
-	return xbmcaddon.Addon(code)
+	if code is None or code == '':
+		return xbmcaddon.Addon()
+	else:
+		return xbmcaddon.Addon(code)
 
 
 def AddonId(code=None):
