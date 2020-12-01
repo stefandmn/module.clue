@@ -145,20 +145,38 @@ def procexec(cmd):
 # Function: funcall
 def funcall(cmd, *args, **kwargs):
 	common.debug("Calling function: %s" % cmd)
-	function = globals()[cmd]
-	return function(*args, **kwargs)
+	try:
+		function = globals()[cmd]
+		_output = function(*args, **kwargs)
+		_status = True
+		if _output is not None:
+			_output = _output.strip()
+	except BaseException as err:
+		common.error("Error while executing global function: %s" % str(err))
+		_status = False
+		_output = str(err)
+	return _status, _output
 
 
 # Function: clscall
 def clscall(cls, cmd, *args, **kwargs):
-	if isinstance(cls, str):
-		sig = type(cls, (), {})
-		object = sig()
-	else:
-		object = cls
-	common.debug("Calling method %s from class %s" %(cmd, type(object)))
-	method = getattr(object, cmd)
-	return method(*args, **kwargs)
+	try:
+		if isinstance(cls, str):
+			sig = type(cls, (), {})
+			object = sig()
+		else:
+			object = cls
+		common.debug("Calling method %s from class %s" %(cmd, type(object)))
+		method = getattr(object, cmd)
+		_output = method(*args, **kwargs)
+		_status = True
+		if _output is not None:
+			_output = _output.strip()
+	except BaseException as err:
+		common.error("Error while executing class function: %s" % str(err))
+		_status = False
+		_output = str(err)
+	return _status, _output
 
 
 # Function: urlcall
