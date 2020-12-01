@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import re
 import sys
 import common
 import urllib3
@@ -141,6 +142,25 @@ def procexec(cmd):
 	return _status, _output
 
 
+# Function: funcall
+def funcall(cmd, *args, **kwargs):
+	common.debug("Calling function: %s" % cmd)
+	function = globals()[cmd]
+	return function(*args, **kwargs)
+
+
+# Function: clscall
+def clscall(cls, cmd, *args, **kwargs):
+	if isinstance(cls, str):
+		sig = type(cls, (), {})
+		object = sig()
+	else:
+		object = cls
+	common.debug("Calling method %s from class %s" %(cmd, type(object)))
+	method = getattr(object, cmd)
+	return method(*args, **kwargs)
+
+
 # Function: urlcall
 def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=3, certver=True, showerr=False):
 	common.debug("Calling URL: %s" % url)
@@ -163,3 +183,39 @@ def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=
 		else:
 			raise err
 	return response
+
+
+# Function: sysinfo
+def sysinfo():
+	name = version = version_id = version_code = description = architecture = device  = ''
+	release_fields = re.compile(r'(?!#)(?P<key>.+)=(?P<quote>[\'\"]?)(?P<value>.+)(?P=quote)$')
+	release_unescape = re.compile(r'\\(?P<escaped>[\'\"\\])')
+	release_info = {}
+	try:
+		with open('/etc/os-release') as f:
+			for line in f:
+				m = re.match(release_fields, line)
+				if m is not None:
+					key = m.group('key')
+					value = re.sub(release_unescape, r'\g<escaped>', m.group('value'))
+					release_info[key] = value
+	except OSError:
+		release_info = None
+	if release_info is not None:
+		if 'NAME' in release_info:
+			name = release_info['NAME']
+		if 'VERSION' in release_info:
+			version = release_info['VERSION']
+		if 'VERSION_ID' in release_info:
+			version_id = release_info['VERSION_ID']
+		if 'VERSION_CODE' in release_info:
+			version_code = release_info['VERSION_CODE']
+		if 'PRETTY_NAME' in release_info:
+			description = release_info['PRETTY_NAME']
+		if 'ARCH' in release_info:
+			architecture = release_info['ARCH']
+		if 'DEVICE' in release_info:
+			device = release_info['DEVICE']
+		return (name, version, version_id, version_code, description, architecture, device)
+	else:
+		return None
