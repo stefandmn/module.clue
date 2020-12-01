@@ -1,4 +1,5 @@
 v2.0
+- Append new generic calls: funcall, clscall, sysinfo
 - Add urlcall function to replace dependncies by particular http libraries
 - Replace urlparse by urllib.parser library
 - Update module icon (to become the template for all Python modules)
