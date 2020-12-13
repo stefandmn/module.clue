@@ -239,8 +239,7 @@ help:
                   ssh location format: <user>@HOST/<base path>\n\
 \n\
 EXAMPLES\n\
-       deploy the entire distribution on a testing environment ('deploy' task is default)\n\
-       > make\n\
+       deploy the entire distribution on a testing environment using a dedicated appliance\n\
        > make deploy\n\n\
        build the entire distribution ('build' make task is default)\n\
        > make build\n\n\

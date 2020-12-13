@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import common
 
 
@@ -19,42 +20,40 @@ else:
 	import xbmcaddon
 
 
-def Addon(code=None):
-	if code is None or code == '':
+
+def Addon():
 		return xbmcaddon.Addon()
-	else:
-		return xbmcaddon.Addon(code)
 
 
-def AddonId(code=None):
-	return Addon(code).getAddonInfo('id')
+def AddonId():
+	return Addon().getAddonInfo('id')
 
 
-def AddonName(code=None):
-	return Addon(code).getAddonInfo('name')
+def AddonName():
+	return Addon().getAddonInfo('name')
 
 
-def AddonIcon(code=None):
-	return Addon(code).getAddonInfo('icon')
+def AddonIcon():
+	return Addon().getAddonInfo('icon')
 
 
-def AddonPath(code=None):
-	return Addon(code).getAddonInfo('path')
+def AddonPath():
+	return Addon().getAddonInfo('path')
 
 
-def AddonVersion(code=None):
-	return Addon(code).getAddonInfo('version')
+def AddonVersion():
+	return Addon().getAddonInfo('version')
 
 
-def AddonProfile(code=None):
-	return Addon(code).getAddonInfo('profile')
+def AddonProfile():
+	return Addon().getAddonInfo('profile')
 
 
 def log(txt, code="", level=0):
 	if not code:
-		msgid = "%s" % AddonId()
+		msgid = "[%s]" % AddonId()
 	else:
-		msgid = "%s [%s]" % (AddonId(), code)
+		msgid = "[%s] [%s]" % (AddonId(), code)
 	try:
 		message = u"%s: %s" % (msgid, txt)
 		xbmc.log(message, level)
@@ -63,17 +62,40 @@ def log(txt, code="", level=0):
 		xbmc.log(message, level)
 
 
-def trace(txt, code=""):
-	if code is None or code == '':
-		code = "TRACE"
+#@property
+def istrace():
+	_TRACE = getSkinSetting("trace")
+	if _TRACE is not None:
+		return common.any2bool(_TRACE)
 	else:
-		code = "%s - %s" %("TRACE", code)
-	if common.any2bool(setting('trace')):
+		return False
+
+
+#@property
+def isdebug():
+	_DEBUG = getSkinSetting("debug")
+	if _DEBUG is not None:
+		return common.any2bool(_DEBUG)
+	else:
+		return False
+
+
+def trace(txt, code=""):
+	if common.istrace():
+		if code is None or code == '':
+			code = "TRACE"
+		else:
+			code = "%s] [%s" % ("TRACE", code)
 		debug(txt, code)
 
 
 def debug(txt, code=""):
-	if common.any2bool(setting('debug')):
+	if common.isdebug() or common.istrace():
+		if code is None or code == '':
+			code = "DEBUG"
+		else:
+			if not code.startswith("TRACE"):
+				code = "%s] [%s" % ("DEBUG", code)
 		log(txt, code, xbmc.LOGNOTICE)
 	else:
 		log(txt, code, xbmc.LOGDEBUG)
@@ -106,8 +128,8 @@ def translate(id):
 	return _value
 
 
-def setting(id, code=None):
-	_value = Addon(code).getSetting(id)
+def setting(id):
+	_value = Addon().getSetting(id)
 	if _value is not None and _value.lower() == "true":
 		return True
 	elif _value is not None and _value.lower() == "false":
@@ -122,17 +144,17 @@ def setting(id, code=None):
 		return _value
 
 
-def getAddonSetting(id, code=None):
-	_value = Addon(code).getSetting(id)
+def getAddonSetting(id):
+	_value = Addon().getSetting(id)
 	if _value is None:
 		_value = ''
 	return _value
 
 
-def setAddonSetting(id, _value=None, code=None):
+def setAddonSetting(id, _value=None):
 	if _value is None:
 		_value = ''
-	Addon(code).setSetting(id, _value)
+	Addon().setSetting(id, _value)
 
 
 def PasswordDialog():
@@ -304,6 +326,57 @@ def NumberInputDialog(title="Input", default=""):
 	return str(result)
 
 
+# This function raises a keyboard date for user input
+def DateInputDialog(title="Input", default=""):
+	if not default:
+		default = ""
+	try:
+		if isinstance(title, int):
+			code = int(title)
+			msg = translate(code)
+		else:
+			msg = title
+	except:
+		msg = title
+	keyboard = xbmcgui.Dialog()
+	result = keyboard.numeric(1, msg, default)
+	return str(result)
+
+
+# This function raises a keyboard time for user input
+def TimeInputDialog(title="Input", default=""):
+	if not default:
+		default = ""
+	try:
+		if isinstance(title, int):
+			code = int(title)
+			msg = translate(code)
+		else:
+			msg = title
+	except:
+		msg = title
+	keyboard = xbmcgui.Dialog()
+	result = keyboard.numeric(2, msg, default)
+	return str(result)
+
+
+# This function raises a keyboard ipaddr for user input
+def IPAddrInputDialog(title="Input", default=""):
+	if not default:
+		default = ""
+	try:
+		if isinstance(title, int):
+			code = int(title)
+			msg = translate(code)
+		else:
+			msg = title
+	except:
+		msg = title
+	keyboard = xbmcgui.Dialog()
+	result = keyboard.numeric(3, msg, default)
+	return str(result)
+
+
 # Run builtin command implemented for GUI
 def RunBuiltinCommand(command, param=None, value=None):
 	if param is None and value is None:
@@ -384,9 +457,43 @@ def setSkinSetting(name, value=None):
 		xbmc.executebuiltin('Skin.ToggleSetting(' + name + ')')
 
 
+# Function: getSkinSetting
+def getSkinSetting(name):
+	try:
+		value = xbmc.getInfoLabel("Skin.String(%s)" %name)
+		if value is None or value == '':
+			value = xbmc.getInfoLabel("Skin.HasSetting(%s)" % name)
+	except:
+		value = None
+	return value
+
+
 # Function: callJSON
 def callJSON(request):
 	response = None
 	if request is not None and request != '':
 		response = xbmc.executeJSONRPC(request)
-	return response
+	return json.loads(response)
+
+
+
+def getSystemSetting(name):
+	data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"%s"}}' % (name))
+	if data is not None and data.has_key("result"):
+		return data['result']['value']
+	else:
+		return None
+
+
+def setSystemSetting(name, value):
+	data = None
+	if isinstance(value, str):
+		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":"%s"}}' % (name, value))
+	elif isinstance(value, int):
+		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%d}}' % (name, value))
+	elif isinstance(value, float):
+		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%f}}' % (name, value))
+	if data is None:
+		common.error("Invalid input value of invalid call")
+	elif data is not None and data.has_key("error"):
+		common.error("Error setting system configuration: %s - %s" %(str(data['error']['code']),str(data['error']['message'])))

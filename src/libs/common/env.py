@@ -5,6 +5,7 @@ import sys
 import common
 import urllib3
 import subprocess
+import traceback
 
 
 # Function: str2bool
@@ -122,7 +123,7 @@ def utf8(v):
 def procexec(cmd):
 	try:
 		if isinstance(cmd, list):
-			common.debug("Preparing command for execution: %s" % (" ".join(cmd)), "commons")
+			common.debug("Preparing command for execution: %s" % (" ".join(cmd)), "procexec")
 			_output = subprocess.check_output(cmd)
 		else:
 			common.debug("Preparing command for execution: %s" % cmd)
@@ -132,19 +133,23 @@ def procexec(cmd):
 			_output = _output.strip()
 		common.debug("Command execution output: [%s] %s" % (str(_status), _output))
 	except subprocess.CalledProcessError as grepexc:
-		common.error("Exception while executing shell command: [%s] %s" % (grepexc.returncode, grepexc.output))
+		common.error("Exception while executing subprocess: [%s] %s" % (grepexc.returncode, grepexc.output), "procexec")
 		_status = False
 		_output = str(grepexc.output)
+		if common.istrace:
+			traceback.print_exc()
 	except BaseException as err:
-		common.error("Error while executing shell command: %s" % str(err))
+		common.error("Error while executing external process: %s" % str(err), "procexec")
 		_status = False
 		_output = str(err)
+		if common.istrace:
+			traceback.print_exc()
 	return _status, _output
 
 
 # Function: funcall
 def funcall(cmd, *args, **kwargs):
-	common.debug("Calling function: %s" % cmd)
+	common.debug("Calling function: %s" % cmd), "funcall"
 	try:
 		function = globals()[cmd]
 		_output = function(*args, **kwargs)
@@ -152,9 +157,11 @@ def funcall(cmd, *args, **kwargs):
 		if _output is not None:
 			_output = _output.strip()
 	except BaseException as err:
-		common.error("Error while executing global function: %s" % str(err))
+		common.error("Error while executing global function: %s" % str(err), "funcall")
 		_status = False
 		_output = str(err)
+		if common.istrace:
+			traceback.print_exc()
 	return _status, _output
 
 
@@ -166,21 +173,23 @@ def clscall(cls, cmd, *args, **kwargs):
 			object = sig()
 		else:
 			object = cls
-		common.debug("Calling method %s from class %s" %(cmd, type(object)))
+		common.debug("Calling method %s from class %s" %(cmd, type(object)), "clscall")
 		method = getattr(object, cmd)
 		_output = method(*args, **kwargs)
 		_status = True
 		if _output is not None:
 			_output = _output.strip()
 	except BaseException as err:
-		common.error("Error while executing class function: %s" % str(err))
+		common.error("Error while executing class function: %s" % str(err), "clscall")
 		_status = False
 		_output = str(err)
+		if common.istrace:
+			traceback.print_exc()
 	return _status, _output
 
 
 # Function: urlcall
-def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=3, certver=True, showerr=False):
+def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=3, certver=True):
 	common.debug("Calling URL: %s" % url)
 	http = urllib3.PoolManager()
 	if certver is False:
@@ -195,11 +204,10 @@ def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=
 		response = request.data
 		request.close()
 	except BaseException as err:
+		common.error("Error while executing HTTP request for [%s] url: %s" % (url, str(err)), "urlcall")
 		response = None
-		if not showerr:
-			common.error("Error while executing HTTP request: %s" % str(err))
-		else:
-			raise err
+		if common.istrace:
+			traceback.print_exc()
 	return response
 
 
