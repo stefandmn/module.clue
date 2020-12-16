@@ -1,6 +1,8 @@
 v2.0
+- Add settings set/get functions
+- Improve logging process to provide debug and trace to system addons
 - Append new generic calls: funcall, clscall, sysinfo
-- Add urlcall function to replace dependncies by particular http libraries
+- Add urlcall function to replace dependencies by particular http libraries
 - Replace urlparse by urllib.parser library
 - Update module icon (to become the template for all Python modules)
 _ Adapt the entire library for Python 3

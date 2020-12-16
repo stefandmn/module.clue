@@ -2,10 +2,18 @@
 
 import re
 import sys
+import json
 import common
-import urllib3
+import requests
 import subprocess
 import traceback
+
+if sys.version_info.major == 3:
+	from urllib.parse import quote, unquote, parse_qsl
+else:
+	from urllib import quote, unquote
+	from urlparse import parse_qsl
+
 
 
 # Function: str2bool
@@ -188,29 +196,6 @@ def clscall(cls, cmd, *args, **kwargs):
 	return _status, _output
 
 
-# Function: urlcall
-def urlcall(url, method='GET', fields=None, headers=None, timeout=None, retries=3, certver=True):
-	common.debug("Calling URL: %s" % url)
-	http = urllib3.PoolManager()
-	if certver is False:
-		http = urllib3.PoolManager(cert_reqs = 'CERT_NONE')
-	if method is None:
-		method = "GET"
-	try:
-		if timeout is not None and timeout > 0.0:
-			request = http.request(method, url, fields=fields, headers=headers, timeout=timeout, retries=retries)
-		else:
-			request = http.request(method, url, fields=fields, headers=headers, retries=retries)
-		response = request.data
-		request.close()
-	except BaseException as err:
-		common.error("Error while executing HTTP request for [%s] url: %s" % (url, str(err)), "urlcall")
-		response = None
-		if common.istrace:
-			traceback.print_exc()
-	return response
-
-
 # Function: sysinfo
 def sysinfo():
 	name = version = version_id = version_code = description = architecture = device  = ''
@@ -245,3 +230,94 @@ def sysinfo():
 		return (name, version, version_id, version_code, description, architecture, device)
 	else:
 		return None
+
+
+# Function: urlcall
+def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout=None, output=None, certver=True):
+	common.debug("Calling URL: %s" %url, "urlcall")
+	if payload is not None and isinstance(payload, str):
+		payload = json.loads(payload)
+		payload = None if not bool(payload) else payload
+	if payload is not None:
+		common.trace("Using payload: %s" %str(payload))
+	if headers is not None and isinstance(headers, str):
+		headers = json.loads(headers)
+		headers = None if not bool(payload) else headers
+	if headers is not None:
+		common.trace("Using headers: %s" %str(headers))
+	if common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False) and proxies is None:
+		httpproxytype = common.getSystemSetting("network.httpproxytype")
+		httpproxyserver = common.getSystemSetting("network.httpproxyserver")
+		httpproxyport = common.getSystemSetting("network.httpproxyport")
+		httpproxyusername = common.getSystemSetting("network.httpproxyusername")
+		httpproxypassword = common.getSystemSetting("network.httpproxypassword")
+		proxyurl = httpproxyserver + ":" + httpproxyport
+		if httpproxyusername is not None and httpproxyusername != '':
+			proxyurl = httpproxyusername + ":" + httpproxypassword + "@" + proxyurl
+		if common.any2int(httpproxytype) == 0:
+			if common.any2int(httpproxyport) == 443 or common.any2int(httpproxyport) == 8443:
+				proxyurl = "https://" + proxyurl
+			else:
+				proxyurl = "http://" + proxyurl
+		elif common.any2int(httpproxytype) == 1 or common.any2int(httpproxytype) == 2:
+			proxyurl = "socks4://" + proxyurl
+		elif common.any2int(httpproxytype) == 3 or common.any2int(httpproxytype) == 4:
+			proxyurl = "socks4://" + proxyurl
+		proxies = {'http': proxyurl, 'https': proxyurl}
+		common.trace("Using proxy: %s" %proxyurl, "urlcall")
+	elif not common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False) and proxies is None:
+		proxies = common.getproxies
+		proxies = None if not bool(proxies) else proxies
+	elif proxies is not None and isinstance(proxies, str):
+		proxies = json.loads(proxies)
+		proxies = None if not bool(proxies) else proxies
+	if proxies is not None:
+		common.trace("Using proxies: %s" %str(proxies))
+	try:
+		if method is None or method.lower() == 'get':
+			response = requests.get(url, params=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		elif method.lower() == 'post':
+			if payload is not None and ((isinstance(payload, str) and payload.find('"file":') >=0 or payload.find("'file':") >=0) or (isinstance(payload, dict) and payload.has_key("file"))):
+				response = requests.post(url, file=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+			else:
+				response = requests.post(url, data=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		elif method.lower() == 'put':
+			response = requests.put(url, data=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		elif method.lower() == 'delete':
+			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		elif method.lower() == 'head':
+			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		elif method.lower() == 'options':
+			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		else:
+			response = None
+		if response is None:
+			common.error("Invalid HTTP method or invalid HTTP call: %s" %str(method), "urlcall")
+		elif response.status_code != requests.codes.ok:
+			common.error("Error received from remote server: HTTP%s - %s" %(str(response.status_code), response.text), "urlcall")
+		if output is None or output == '' or output == 'text' or output == 'string':
+			return response.text
+		elif output =='bin' or output == 'binary':
+			return response.content
+		elif output =='json':
+			return response.json()
+		elif output =='response' or output =='original':
+			return response
+	except BaseException as err:
+		common.error("Error while executing HTTP request for [%s] url: %s" % (url, str(err)), "urlcall")
+		response = None
+		if common.istrace:
+			traceback.print_exc()
+	return response
+
+
+def urlquote(text):
+	return quote(text)
+
+
+def urlunquote(text):
+	return unquote(text)
+
+
+def urlparsequery(qs):
+	return parse_qsl(qs)
