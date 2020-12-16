@@ -1,8 +1,9 @@
 v2.0
+- Add Python version independent references for url used functions: 'urlquote', 'urlunquote', 'urlparsequery'
 - Add settings set/get functions
 - Improve logging process to provide debug and trace to system addons
 - Append new generic calls: funcall, clscall, sysinfo
-- Add urlcall function to replace dependencies by particular http libraries
+- Add urlcall function to replace dependencies by particular http/url libraries
 - Replace urlparse by urllib.parser library
 - Update module icon (to become the template for all Python modules)
 _ Adapt the entire library for Python 3

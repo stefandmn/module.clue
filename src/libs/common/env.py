@@ -265,9 +265,6 @@ def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout
 			proxyurl = "socks4://" + proxyurl
 		proxies = {'http': proxyurl, 'https': proxyurl}
 		common.trace("Using proxy: %s" %proxyurl, "urlcall")
-	elif not common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False) and proxies is None:
-		proxies = common.getproxies
-		proxies = None if not bool(proxies) else proxies
 	elif proxies is not None and isinstance(proxies, str):
 		proxies = json.loads(proxies)
 		proxies = None if not bool(proxies) else proxies
@@ -321,3 +318,6 @@ def urlunquote(text):
 
 def urlparsequery(qs):
 	return parse_qsl(qs)
+
+def getproxies():
+	return
