@@ -15,7 +15,6 @@ else:
 	from urlparse import parse_qsl
 
 
-
 # Function: str2bool
 def any2bool(v, error=False, none=True):
 	if v is not None:
@@ -232,6 +231,37 @@ def sysinfo():
 		return None
 
 
+def getproxies():
+	global PROXIES
+	if PROXIES is None:
+		if common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False):
+			httpproxytype = common.getSystemSetting("network.httpproxytype")
+			httpproxyserver = common.getSystemSetting("network.httpproxyserver")
+			httpproxyport = common.getSystemSetting("network.httpproxyport")
+			httpproxyusername = common.getSystemSetting("network.httpproxyusername")
+			httpproxypassword = common.getSystemSetting("network.httpproxypassword")
+			proxyurl = httpproxyserver + ":" + httpproxyport
+			if httpproxyusername is not None and httpproxyusername != '':
+				proxyurl = httpproxyusername + ":" + httpproxypassword + "@" + proxyurl
+			if common.any2int(httpproxytype) == 0:
+				if common.any2int(httpproxyport) == 443 or common.any2int(httpproxyport) == 8443:
+					proxyurl = "https://" + proxyurl
+				else:
+					proxyurl = "http://" + proxyurl
+			elif common.any2int(httpproxytype) == 1 or common.any2int(httpproxytype) == 2:
+				proxyurl = "socks4://" + proxyurl
+			elif common.any2int(httpproxytype) == 3 or common.any2int(httpproxytype) == 4:
+				proxyurl = "socks4://" + proxyurl
+			PROXIES = {'http': proxyurl, 'https': proxyurl}
+			common.trace("Detecting proxy in Kodi: %s" % proxyurl, "urlcall")
+		else:
+			PROXIES = {}
+	if PROXIES is not None and not bool(PROXIES):
+		return PROXIES
+	else:
+		return None
+
+
 # Function: urlcall
 def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout=None, output=None, certver=True):
 	common.debug("Calling URL: %s" %url, "urlcall")
@@ -245,26 +275,8 @@ def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout
 		headers = None if not bool(payload) else headers
 	if headers is not None:
 		common.trace("Using headers: %s" %str(headers))
-	if common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False) and proxies is None:
-		httpproxytype = common.getSystemSetting("network.httpproxytype")
-		httpproxyserver = common.getSystemSetting("network.httpproxyserver")
-		httpproxyport = common.getSystemSetting("network.httpproxyport")
-		httpproxyusername = common.getSystemSetting("network.httpproxyusername")
-		httpproxypassword = common.getSystemSetting("network.httpproxypassword")
-		proxyurl = httpproxyserver + ":" + httpproxyport
-		if httpproxyusername is not None and httpproxyusername != '':
-			proxyurl = httpproxyusername + ":" + httpproxypassword + "@" + proxyurl
-		if common.any2int(httpproxytype) == 0:
-			if common.any2int(httpproxyport) == 443 or common.any2int(httpproxyport) == 8443:
-				proxyurl = "https://" + proxyurl
-			else:
-				proxyurl = "http://" + proxyurl
-		elif common.any2int(httpproxytype) == 1 or common.any2int(httpproxytype) == 2:
-			proxyurl = "socks4://" + proxyurl
-		elif common.any2int(httpproxytype) == 3 or common.any2int(httpproxytype) == 4:
-			proxyurl = "socks4://" + proxyurl
-		proxies = {'http': proxyurl, 'https': proxyurl}
-		common.trace("Using proxy: %s" %proxyurl, "urlcall")
+	if proxies is None:
+		proxies = getproxies()
 	elif proxies is not None and isinstance(proxies, str):
 		proxies = json.loads(proxies)
 		proxies = None if not bool(proxies) else proxies
@@ -318,6 +330,3 @@ def urlunquote(text):
 
 def urlparsequery(qs):
 	return parse_qsl(qs)
-
-def getproxies():
-	return
