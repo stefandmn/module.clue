@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
 import re
 import sys
 import json
 import common
-import requests
+import urllib3
+import certifi
 import subprocess
 import traceback
 
@@ -13,6 +15,9 @@ if sys.version_info.major == 3:
 else:
 	from urllib import quote, unquote
 	from urlparse import parse_qsl
+
+
+PROXIES = None
 
 
 # Function: str2bool
@@ -41,7 +46,8 @@ def any2bool(v, error=False, none=True):
 		if none:
 			return False
 		else:
-			raise RuntimeError("Invalid null value")
+			if error:
+				raise RuntimeError("Invalid null value")
 
 
 # Function: any2int
@@ -52,15 +58,22 @@ def any2int(v, error=False, none=True):
 		else:
 			try:
 				return int(v)
-			except:
+			except BaseException as be:
 				if error:
-					raise RuntimeError("Invalid int type: " + str(v))
+					raise RuntimeError(be)
 				else:
-					return None
+					if isinstance(none, int):
+						return none
+					elif isinstance(none, bool) and none:
+						return None
+					elif isinstance(none, bool) and not none:
+						raise RuntimeError("Invalid value: " + str(v))
 	else:
-		if none:
+		if isinstance(none, int):
+			return none
+		elif isinstance(none, bool) and none:
 			return None
-		else:
+		elif (isinstance(none, bool) and not none) or error:
 			raise RuntimeError("Invalid null value")
 
 
@@ -72,15 +85,22 @@ def any2float(v, error=False, none=True):
 		else:
 			try:
 				return float(v)
-			except:
+			except BaseException as be:
 				if error:
-					raise RuntimeError("Invalid float type: " + str(v))
+					raise RuntimeError(be)
 				else:
-					return None
+					if isinstance(none, float):
+						return none
+					elif isinstance(none, bool) and none:
+						return None
+					elif isinstance(none, bool) and not none:
+						raise RuntimeError("Invalid value: " + str(v))
 	else:
-		if none:
+		if isinstance(none, float):
+			return none
+		elif isinstance(none, bool) and none:
 			return None
-		else:
+		elif (isinstance(none, bool) and not none) or error:
 			raise RuntimeError("Invalid null value")
 
 
@@ -92,15 +112,22 @@ def any2str(v, error=False, none=True):
 		else:
 			try:
 				return str(v)
-			except:
+			except BaseException as be:
 				if error:
-					raise RuntimeError("Invalid str type: " + str(v))
+					raise RuntimeError(be)
 				else:
-					return None
+					if isinstance(none, str):
+						return none
+					elif isinstance(none, bool) and none:
+						return None
+					elif isinstance(none, bool) and not none:
+						raise RuntimeError("Invalid value: " + str(v))
 	else:
-		if none:
+		if isinstance(none, str):
+			return none
+		elif isinstance(none, bool) and none:
 			return None
-		else:
+		elif (isinstance(none, bool) and not none) or error:
 			raise RuntimeError("Invalid null value")
 
 
@@ -256,68 +283,89 @@ def getproxies():
 			common.trace("Detecting proxy in Kodi: %s" % proxyurl, "urlcall")
 		else:
 			PROXIES = {}
-	if PROXIES is not None and not bool(PROXIES):
-		return PROXIES
-	else:
-		return None
+	return PROXIES
 
 
 # Function: urlcall
-def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout=None, output=None, certver=True):
+def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout=None, retries=3, output=None, certver=None):
 	common.debug("Calling URL: %s" %url, "urlcall")
+	# ssl validation
+	if certver is not None and isinstance(certver, bool) and certver is False:
+		urllib3.disable_warnings()
+		http = urllib3.PoolManager( cert_reqs='CERT_NONE')
+	else:
+		if certver is not None and isinstance(certver, bool) and certver is True:
+			http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
+		elif certver is not None and isinstance(certver, str) and os.path.exists(certver):
+			http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certver)
+		else:
+			http = urllib3.PoolManager()
+	common.trace("Using HTTP Manager %s SSL validation: %s" %('without' if certver is not None and isinstance(certver, bool) and certver is False else 'with', str(certver)), "urlcall")
+	# method identification
+	if method is None or method.lower() not in ["get", "post", "head", "delete", "put", "patch"]:
+		method = "GET"
+	else:
+		method = method.upper()
+	common.trace("Using method: %s" % str(method), "urlcall")
+	# payload validation
 	if payload is not None and isinstance(payload, str):
 		payload = json.loads(payload)
 		payload = None if not bool(payload) else payload
 	if payload is not None:
-		common.trace("Using payload: %s" %str(payload))
+		common.trace("Using payload: %s" %str(payload), "urlcall")
+	# header validation
 	if headers is not None and isinstance(headers, str):
 		headers = json.loads(headers)
-		headers = None if not bool(payload) else headers
+		headers = None if not bool(headers) else headers
 	if headers is not None:
-		common.trace("Using headers: %s" %str(headers))
+		common.trace("Using headers: %s" %str(headers), "urlcall")
+	# proxies considerations
 	if proxies is None:
 		proxies = getproxies()
 	elif proxies is not None and isinstance(proxies, str):
 		proxies = json.loads(proxies)
 		proxies = None if not bool(proxies) else proxies
-	if proxies is not None:
-		common.trace("Using proxies: %s" %str(proxies))
+	if proxies is not None and len(proxies) >0:
+		common.trace("Using proxies: %s" % str(proxies), "urlcall")
+		if proxies["http"].startswith("http"):
+			http = urllib3.ProxyManager(self=http, proxy_url=proxies["http"])
+		elif proxies["http"].startswith("https"):
+			http = urllib3.ProxyManager(self=http, proxy_url=proxies["https"])
+		elif proxies["http"].startswith("socks4"):
+			http = urllib3.contrib.socks.SOCKSProxyManager(self=http, proxy_url=proxies["socks4"])
+		elif proxies["http"].startswith("socks5"):
+			http = urllib3.contrib.socks.SOCKSProxyManager(self=http, proxy_url=proxies["socks5"])
 	try:
-		if method is None or method.lower() == 'get':
-			response = requests.get(url, params=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-		elif method.lower() == 'post':
-			if payload is not None and ((isinstance(payload, str) and payload.find('"file":') >=0 or payload.find("'file':") >=0) or (isinstance(payload, dict) and payload.has_key("file"))):
-				response = requests.post(url, file=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-			else:
-				response = requests.post(url, data=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-		elif method.lower() == 'put':
-			response = requests.put(url, data=payload, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-		elif method.lower() == 'delete':
-			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-		elif method.lower() == 'head':
-			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
-		elif method.lower() == 'options':
-			response = requests.put(url, headers=headers, proxies=proxies, timeout=timeout, verify=certver)
+		# process the request
+		if timeout is not None and timeout > 0.0:
+			response = http.request(method, url, fields=payload, headers=headers, timeout=timeout, retries=retries)
 		else:
-			response = None
-		if response is None:
-			common.error("Invalid HTTP method or invalid HTTP call: %s" %str(method), "urlcall")
-		elif response.status_code != requests.codes.ok:
-			common.error("Error received from remote server: HTTP%s - %s" %(str(response.status_code), response.text), "urlcall")
-		if output is None or output == '' or output == 'text' or output == 'string':
-			return response.text
-		elif output =='bin' or output == 'binary':
-			return response.content
-		elif output =='json':
-			return response.json()
-		elif output =='response' or output =='original':
-			return response
+			response = http.request(method, url, fields=payload, headers=headers, retries=retries)
+		# check the response
+		if response is not None and response.status != 200:
+			common.error("Error received from remote server: HTTP%s - %s" %(str(response.status), response.data), "urlcall")
+			data = None
+		elif response is not None:
+			if output is None or output == '' or output == 'text' or output == 'string':
+				data = str(response.data)
+			elif output =='bin' or output == 'binary':
+				data = response.data
+			elif output =='json':
+				data = json.loads(response.data.decode('utf-8'))
+			elif output =='response' or output =='original':
+				data = response
+			else:
+				common.error("Invalid output format: %s" %output, "urlcall")
+				data = None
+		else:
+			common.error("Null response", "urlcall")
+			data = None
 	except BaseException as err:
 		common.error("Error while executing HTTP request for [%s] url: %s" % (url, str(err)), "urlcall")
-		response = None
+		data = None
 		if common.istrace:
 			traceback.print_exc()
-	return response
+	return data
 
 
 def urlquote(text):

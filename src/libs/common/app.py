@@ -22,7 +22,7 @@ else:
 
 
 def Addon():
-		return xbmcaddon.Addon()
+	return xbmcaddon.Addon()
 
 
 def AddonId():
@@ -49,20 +49,23 @@ def AddonProfile():
 	return Addon().getAddonInfo('profile')
 
 
+def agent():
+	return xbmc.getUserAgent()
+
+
 def log(txt, code="", level=0):
 	if not code:
 		msgid = "[%s]" % AddonId()
 	else:
 		msgid = "[%s] [%s]" % (AddonId(), code)
 	try:
-		message = u"%s: %s" % (msgid, txt)
+		message = "%s: %s" % (msgid, txt)
 		xbmc.log(message, level)
 	except:
-		message = u"%s: %s" % (msgid, repr(txt))
+		message = "%s: %s" % (msgid, repr(txt))
 		xbmc.log(message, level)
 
 
-#@property
 def istrace():
 	_TRACE = getSkinSetting("trace")
 	if _TRACE is not None:
@@ -71,7 +74,6 @@ def istrace():
 		return False
 
 
-#@property
 def isdebug():
 	_DEBUG = getSkinSetting("debug")
 	if _DEBUG is not None:
@@ -479,21 +481,22 @@ def callJSON(request):
 
 def getSystemSetting(name):
 	data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"%s"}}' % (name))
-	if data is not None and data.has_key("result"):
+	if data is not None and "result" in data:
 		return data['result']['value']
 	else:
 		return None
 
 
 def setSystemSetting(name, value):
-	data = None
-	if isinstance(value, str):
+	if isinstance(value, str) :
 		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":"%s"}}' % (name, value))
 	elif isinstance(value, int):
 		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%d}}' % (name, value))
 	elif isinstance(value, float):
 		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%f}}' % (name, value))
+	else:
+		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":"%s"}}' % (name, str(value)))
 	if data is None:
-		common.error("Invalid input value of invalid call")
-	elif data is not None and data.has_key("error"):
-		common.error("Error setting system configuration: %s - %s" %(str(data['error']['code']),str(data['error']['message'])))
+		common.error("Invalid [%s] system configuration or invalid [%s] input value" %(name,value), "systemsetting")
+	elif data is not None and "error" in data:
+		common.error("Error setting [%s] system configuration with [%s] value: %s - %s" %(name, value, str(data['error']['code']),str(data['error']['message'])), "systemsetting")
