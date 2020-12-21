@@ -471,11 +471,27 @@ def getSkinSetting(name):
 
 
 # Function: callJSON
-def callJSON(request):
+def callJSON(request=None, method=None, params=None):
 	response = None
 	if request is not None and request != '':
 		response = xbmc.executeJSONRPC(request)
-	return json.loads(response)
+		return json.loads(response)
+	elif method is not None and method != '':
+		if params is None or params == '':
+			params = "{}"
+		elif isinstance(params, dict):
+			params = json.dumps(params)
+		else:
+			params = str(params)
+			if not params.startswith("{"):
+				params = "{" + params
+			if not params.endswith("}"):
+				params = params + "}"
+		response = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"%s", "params":%s}' % (method, params))
+		return json.loads(response)
+	else:
+		return response
+
 
 
 

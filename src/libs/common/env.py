@@ -292,7 +292,7 @@ def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout
 	# ssl validation
 	if certver is not None and isinstance(certver, bool) and certver is False:
 		urllib3.disable_warnings()
-		http = urllib3.PoolManager( cert_reqs='CERT_NONE')
+		http = urllib3.PoolManager(cert_reqs='CERT_NONE')
 	else:
 		if certver is not None and isinstance(certver, bool) and certver is True:
 			http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
