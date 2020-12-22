@@ -2,7 +2,7 @@
 
 __all__ = ['Addon', 'AddonId', 'AddonName', 'AddonIcon', 'AddonPath', 'AddonVersion', 'AddonProfile',
 		'log', 'trace', 'debug', 'info', 'notice', 'warn', 'error', 'istrace', 'isdebug', 'agent',
-		'translate', 'setting', 'getAddonSetting', 'setAddonSetting', 'RunBuiltinCommand',
+		'translate', 'setting', 'setsetting', 'getAddonSetting', 'setAddonSetting', 'runBuiltinCommand',
 		'getSystemSetting', 'setSystemSetting', 'getSkinProperty', 'setSkinProperty', 'getSkinSetting', 'setSkinSetting',
 		'PasswordDialog', 'NotificationMsg', 'DlgNotificationMsg', 'AskRestart', 'YesNoDialog',
 		'OkDialog', 'SelectDialog', 'StringInputDialog', 'NumberInputDialog',
@@ -12,7 +12,7 @@ __all__ = ['Addon', 'AddonId', 'AddonName', 'AddonIcon', 'AddonPath', 'AddonVers
 
 from .app import log, trace, debug, info, notice, warn, error, translate, setting, istrace, isdebug, agent
 from .app import Addon, AddonId, AddonName, AddonIcon, AddonPath, AddonVersion, AddonProfile
-from .app import getAddonSetting, setAddonSetting, RunBuiltinCommand, getSystemSetting, setSystemSetting
+from .app import getAddonSetting, setAddonSetting, setsetting, runBuiltinCommand, getSystemSetting, setSystemSetting
 from .app import PasswordDialog, NotificationMsg, DlgNotificationMsg, AskRestart, YesNoDialog
 from .app import OkDialog, SelectDialog, StringInputDialog, NumberInputDialog
 from .app import DateInputDialog, TimeInputDialog, IPAddrInputDialog, getSkinSetting

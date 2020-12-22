@@ -8,6 +8,7 @@ but is expecting to find the os OS level the following Python livrariers:
  - `re` (it has to be embedded in Python environment)
  - `xbmc` (Kodi Python API) 
  - `urllib3` (for Python 2.7 and Python 3)
+ - `locale` (Internationalization services)
  - `subprocess` (typically is embedded in Python environment)
 
 Development, testing and deployment activities are driven by CCM process (Clue 

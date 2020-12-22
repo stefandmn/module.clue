@@ -21,32 +21,35 @@ else:
 
 
 
-def Addon():
-	return xbmcaddon.Addon()
+def Addon(code=None):
+	if code is None or code == '':
+		return xbmcaddon.Addon()
+	else:
+		return xbmcaddon.Addon(code)
 
 
-def AddonId():
-	return Addon().getAddonInfo('id')
+def AddonId(code=None):
+	return Addon(code).getAddonInfo('id')
 
 
-def AddonName():
-	return Addon().getAddonInfo('name')
+def AddonName(code=None):
+	return Addon(code).getAddonInfo('name')
 
 
-def AddonIcon():
-	return Addon().getAddonInfo('icon')
+def AddonIcon(code=None):
+	return Addon(code).getAddonInfo('icon')
 
 
-def AddonPath():
-	return Addon().getAddonInfo('path')
+def AddonPath(code=None):
+	return Addon(code).getAddonInfo('path')
 
 
-def AddonVersion():
-	return Addon().getAddonInfo('version')
+def AddonVersion(code=None):
+	return Addon(code).getAddonInfo('version')
 
 
-def AddonProfile():
-	return Addon().getAddonInfo('profile')
+def AddonProfile(code=None):
+	return Addon(code).getAddonInfo('profile')
 
 
 def agent():
@@ -131,7 +134,16 @@ def translate(id):
 
 
 def setting(id):
-	_value = Addon().getSetting(id)
+	return common.getAddonSetting(None, id)
+
+
+def setsetting(id, _value=None):
+	common.setAddonSetting(None, id, _value)
+
+
+def getAddonSetting(code, id):
+	_addon = Addon(code)
+	_value = _addon.getSetting(id)
 	if _value is not None and _value.lower() == "true":
 		return True
 	elif _value is not None and _value.lower() == "false":
@@ -146,17 +158,20 @@ def setting(id):
 		return _value
 
 
-def getAddonSetting(id):
-	_value = Addon().getSetting(id)
+def setAddonSetting(code, id, _value=None):
+	_addon = Addon(code)
 	if _value is None:
 		_value = ''
-	return _value
-
-
-def setAddonSetting(id, _value=None):
-	if _value is None:
-		_value = ''
-	Addon().setSetting(id, _value)
+	if isinstance(_value, bool):
+		_addon.setSettingBool(id, _value)
+	elif isinstance(_value, int):
+		_addon.setSettingInt(id, _value)
+	elif isinstance(_value, float):
+		_addon.setSettingNumber(id, _value)
+	elif isinstance(_value, str):
+		_addon.setSettingString(id, _value)
+	else:
+		_addon.setSetting(id, _value)
 
 
 def PasswordDialog():
@@ -380,15 +395,15 @@ def IPAddrInputDialog(title="Input", default=""):
 
 
 # Run builtin command implemented for GUI
-def RunBuiltinCommand(command, param=None, value=None):
-	if param is None and value is None:
-		xbmc.executebuiltin(command)
-	elif param is not None and value is None:
-		xbmc.executebuiltin(command + '(' + param + ')')
-	elif param is not None and value is not None:
-		xbmc.executebuiltin(command + '(' + param + ',' + str(value) + ')')
-	elif param is None and value is not None:
-		xbmc.executebuiltin(command + '(' + str(value) + ')')
+def runBuiltinCommand(command, param=None, values=None, wait=False):
+	if param is None and values is None:
+		xbmc.executebuiltin(command, wait)
+	elif param is not None and values is None:
+		xbmc.executebuiltin(command + '(' + param + ')', wait)
+	elif param is not None and values is not None:
+		xbmc.executebuiltin(command + '(' + param + ',' + str(values) + ')', wait)
+	elif param is None and values is not None:
+		xbmc.executebuiltin(command + '(' + str(values) + ')', wait)
 
 
 # Function: sleep
@@ -487,16 +502,16 @@ def callJSON(request=None, method=None, params=None):
 				params = "{" + params
 			if not params.endswith("}"):
 				params = params + "}"
-		response = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"%s", "params":%s}' % (method, params))
+		request = '{"jsonrpc":"2.0", "id":1, "method":"%s", "params":%s}' % (method, params)
+		response = xbmc.executeJSONRPC(request)
 		return json.loads(response)
 	else:
 		return response
 
 
 
-
 def getSystemSetting(name):
-	data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.GetSettingValue", "params":{"setting":"%s"}}' % (name))
+	data = common.callJSON(method="Settings.GetSettingValue", params={"setting":name})
 	if data is not None and "result" in data:
 		return data['result']['value']
 	else:
@@ -504,14 +519,9 @@ def getSystemSetting(name):
 
 
 def setSystemSetting(name, value):
-	if isinstance(value, str) :
-		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":"%s"}}' % (name, value))
-	elif isinstance(value, int):
-		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%d}}' % (name, value))
-	elif isinstance(value, float):
-		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":%f}}' % (name, value))
-	else:
-		data = common.callJSON('{"jsonrpc":"2.0", "id":1, "method":"Settings.SetSettingValue", "params":{"setting":"%s", "value":"%s"}}' % (name, str(value)))
+	if value is None:
+		value = ""
+	data = common.callJSON(method="Settings.SetSettingValue", params={"setting":name, "value":value})
 	if data is None:
 		common.error("Invalid [%s] system configuration or invalid [%s] input value" %(name,value), "systemsetting")
 	elif data is not None and "error" in data:
