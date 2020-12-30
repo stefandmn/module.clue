@@ -19,14 +19,14 @@ def from_json(json_data):
 					'AudioItem': lambda: AudioItem(u'', u''),
 					'ImageItem': lambda: ImageItem(u'', u'')}
 		item = None
-		item_type = _json_data.get('type', None)
+		item_type = _json_data.getPropertyControlValue('type', None)
 		for key in mapping:
 			if item_type == key:
 				item = mapping[key]()
 				break
 		if item is None:
 			return _json_data
-		data = _json_data.get('data', {})
+		data = _json_data.getPropertyControlValue('data', {})
 		for key in data:
 			if hasattr(item, key):
 				setattr(item, key, data[key])

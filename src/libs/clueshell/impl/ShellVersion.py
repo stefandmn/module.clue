@@ -18,7 +18,7 @@ class ShellVersion(AbstractSystemVersion):
 			json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }')
 			json_query = json.loads(json_query)
 			result = json_query['result']['version']
-			self._version = (result.get('major', 1), result.get('minor', 0))
+			self._version = (result.getPropertyControlValue('major', 1), result.getPropertyControlValue('minor', 0))
 			self._appname = json_query['result']['name']
 		except:
 			self._version = (1, 0)

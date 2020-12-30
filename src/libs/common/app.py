@@ -22,6 +22,13 @@ else:
 
 
 def Addon(code=None):
+	"""
+	Instantiates an addon object given by xbmcaddon library. Might be the current addon
+	(when you call this method) or a particular one deployed in your Kodi environment
+	in case code parameter is specified
+	:param code: addon id in case you need the instance of a particular addon or none
+	:return: instance of Kodi addon provided by xbmcaddon
+	"""
 	if code is None or code == '':
 		return xbmcaddon.Addon()
 	else:
@@ -29,34 +36,87 @@ def Addon(code=None):
 
 
 def AddonId(code=None):
+	"""
+	Provides addon id. This function is is mainly used in the addon when you don't want to
+	hardcode the current addon id.
+	:param code: addon id in case you need to take the data (addon id) from a particular
+	addon instance
+	:return: addon id returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('id')
 
 
 def AddonName(code=None):
+	"""
+	Provides addon name.
+	:param code: addon id in case you need to take the data (addon name) from a particular
+	addon instance. For None value (the default one) it will return the name of the current addon.
+	:return: addon name returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('name')
 
 
 def AddonIcon(code=None):
+	"""
+	Provides addon icon.
+	:param code: addon id in case you need to take the data (addon icon) from a particular
+	addon instance. For None value (the default one) it will return the icon of the current addon.
+	:return: addon icon returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('icon')
 
 
 def AddonPath(code=None):
+	"""
+	Provides addon path - file system location where is installed.
+	:param code: addon id in case you need to take the data (addon path) from a particular
+	addon instance. For None value (the default one) it will return the path of the current addon.
+	:return: addon file system installation location returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('path')
 
 
 def AddonVersion(code=None):
+	"""
+	Provides addon version.
+	:param code: addon id in case you need to take the data (addon version) from a particular
+	addon instance. For None value (the default one) it will return the version of the current addon.
+	:return: addon version returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('version')
 
 
 def AddonProfile(code=None):
+	"""
+	Provides addon path - file system location where the addon has the configuration profile.
+	:param code: addon id in case you need to take the data (addon profile location) from a particular
+	addon instance. For None value (the default one) it will return the profile location of the current addon.
+	:return: addon file system profile location returned by the instance of the requested addon
+	"""
 	return Addon(code).getAddonInfo('profile')
 
 
 def agent():
+	"""
+	Provides the HTTP user agent, typically used in the header of various HTTP calls
+	:return: KOdi user agent name aggregating many information about the system where the Kodi is running
+	"""
 	return xbmc.getUserAgent()
 
 
 def log(txt, code="", level=0):
+	"""
+	INternal function to handle all type of logging
+	:param txt: text message to be displayed in the log
+	:param code: a particular log channel. In case the code is missing the channel is dictated by the c
+	urrent addon id. if is not empty it the channel will be described by a master channel (addon id) and
+	a sub channel (your custom channel - provided by your code)
+	:param level: log level, it could be: TRACE, DEBUG, INFO, NOTICE, WARN and ERROR. There two levels
+	(TRACE and DEBUG) that can be activated to the Skin level (in default skin configuration) that can
+	work over NOTIVE level/channel in order to display in the log addon verbosity but in the same time to
+	prevent verbosity provided by the whole system. The standard log level is activate by Kodi system
+	settings (Logging area)
+	"""
 	if not code:
 		msgid = "[%s]" % AddonId()
 	else:
@@ -70,6 +130,13 @@ def log(txt, code="", level=0):
 
 
 def istrace():
+	"""
+	Checks if the TRACE level is activated. As it was mentioning in the log function, TRACE and DEBUG levels
+	can be activated to the Skin level using "trace" skin setting property. In case TRACE level is activated
+	to the Skin level will provide messages in the log over NOTICE level and through a particular TRACE channel,
+	on top on the default and custom channels.
+	:return: True is the TRACE level is active.
+	"""
 	_TRACE = getSkinSetting("trace")
 	if _TRACE is not None:
 		return common.any2bool(_TRACE)
@@ -78,6 +145,14 @@ def istrace():
 
 
 def isdebug():
+	"""
+	Checks if the DEBUG level is activated. As it was mentioning in the log function, DEBUG level
+	can be activated to the Skin level using 'debug' skin setting property, or to the Kodi system
+	configuration. level (using Logging area). In case DEBUG level is activated to the Skin level
+	will provide messages in the log over NOTICE level and through a particular DEBUG channel,
+	on top on the default and custom channels.
+	:return: True is the DEBUG level is active.
+	"""
 	_DEBUG = getSkinSetting("debug")
 	if _DEBUG is not None:
 		return common.any2bool(_DEBUG)
@@ -86,6 +161,11 @@ def isdebug():
 
 
 def trace(txt, code=""):
+	"""
+	Writes TRACE text messages in the log over TRACE custom channel.
+	:param txt: text message to be written in the log
+	:param code: custom log channel that might be used to recognize easily your messages.
+	"""
 	if common.istrace():
 		if code is None or code == '':
 			code = "TRACE"
@@ -95,6 +175,12 @@ def trace(txt, code=""):
 
 
 def debug(txt, code=""):
+	"""
+	Writes DEBUG text messages in the log over DEBUG custom channel (in case the level is activated
+	to the SKin level) or over standard channel using DEBUG system level.
+	:param txt: text message to be written in the log
+	:param code: addition custom log channel that might be used to recognize easily your messages.
+	"""
 	if common.isdebug() or common.istrace():
 		if code is None or code == '':
 			code = "DEBUG"
@@ -107,18 +193,39 @@ def debug(txt, code=""):
 
 
 def info(txt, code=""):
+	"""
+	Write INFO text messages in the log over standard INFO logging level
+	:param txt: text message to be written in the log
+	:param code: custom log channel that might be used to recognize easily your messages.
+	"""
 	log(txt, code, xbmc.LOGINFO)
 
 
 def notice(txt, code=""):
+	"""
+	Write NOTICE text messages in the log over standard NOTICE logging level. NOTICE is the default
+	logging level within the Kodi system
+	:param txt: text message to be written in the log
+	:param code: custom log channel that might be used to recognize easily your messages.
+	"""
 	log(txt, code, xbmc.LOGNOTICE)
 
 
 def warn(txt, code=""):
+	"""
+	Write WARNING text messages in the log over standard WARN logging level
+	:param txt: text message to be written in the log
+	:param code: custom log channel that might be used to recognize easily your messages.
+	"""
 	log(txt, code, xbmc.LOGWARNING)
 
 
 def error(txt, code=""):
+	"""
+	Write ERROR text messages in the log over standard ERROR logging level
+	:param txt: text message to be written in the log
+	:param code: custom log channel that might be used to recognize easily your messages.
+	"""
 	log(txt, code, xbmc.LOGERROR)
 
 

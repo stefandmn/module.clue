@@ -28,9 +28,9 @@ def any2bool(v, error=False, none=True):
 		elif isinstance(v, int):
 			return True if v > 0 else False
 		elif isinstance(v, str):
-			if v.lower() in ("on", "yes", "true", "0"):
+			if v.lower() in ("on", "yes", "true", "1"):
 				return True
-			elif v.lower() in ("off", "no", "false", "1"):
+			elif v.lower() in ("off", "no", "false", "0"):
 				return False
 			else:
 				if error:
@@ -145,12 +145,18 @@ def isempty(v):
 
 
 #Function utf8
-def utf8(v):
-	if v is not None:
+def utf8(value):
+	if value is not None:
 		if sys.version_info[0] == 2:
-			return str(v).encode('utf-8', 'ignore')
+			try:
+				return value.encode('utf-8', 'ignore')
+			except:
+				value = value.encode('ascii', 'ignore').decode('ascii', 'ignore')
+				return value.encode('utf-8', 'ignore')
+		else:
+			return str(value)
 	else:
-		return v
+		return value
 
 
 # Function: procexec
@@ -182,10 +188,10 @@ def procexec(cmd):
 
 
 # Function: funcall
-def funcall(cmd, *args, **kwargs):
-	common.debug("Calling function: %s" % cmd), "funcall"
+def funcall(fnc, *args, **kwargs):
+	common.debug("Calling function: %s" % fnc), "funcall"
 	try:
-		function = globals()[cmd]
+		function = globals()[fnc]
 		_output = function(*args, **kwargs)
 		_status = True
 		if _output is not None:
@@ -200,15 +206,15 @@ def funcall(cmd, *args, **kwargs):
 
 
 # Function: clscall
-def clscall(cls, cmd, *args, **kwargs):
+def clscall(cls, mtd, *args, **kwargs):
 	try:
 		if isinstance(cls, str):
 			sig = type(cls, (), {})
 			object = sig()
 		else:
 			object = cls
-		common.debug("Calling method %s from class %s" %(cmd, type(object)), "clscall")
-		method = getattr(object, cmd)
+		common.debug("Calling method %s from class %s" % (mtd, type(object)), "clscall")
+		method = getattr(object, mtd)
 		_output = method(*args, **kwargs)
 		_status = True
 		if _output is not None:
