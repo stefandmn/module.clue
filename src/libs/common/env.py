@@ -171,7 +171,7 @@ def procexec(cmd):
 		_status = True
 		if _output is not None:
 			_output = _output.strip()
-		common.debug("Command execution output: [%s] %s" % (str(_status), _output))
+		common.trace("Command execution output: [%s] %s" % (str(_status), _output))
 	except subprocess.CalledProcessError as grepexc:
 		common.error("Exception while executing subprocess: [%s] %s" % (grepexc.returncode, grepexc.output), "procexec")
 		_status = False

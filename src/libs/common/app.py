@@ -385,28 +385,40 @@ def OkDialog(line1="", line2="", line3=""):
 
 
 # This functions displays select dialog
-def SelectDialog(line='', options=None):
+def SelectDialog(title="", default="", options=None):
 	try:
-		if isinstance(line, int):
-			code = int(line)
+		if isinstance(title, int):
+			code = int(title)
 			msg = translate(code)
 		else:
-			msg = line
+			msg = title
 	except:
-		msg = line
+		msg = title
 	if msg is None or msg == '':
 		msg = AddonName()
 	if not isinstance(options, list):
-		if str(options).count('\n') > 0:
-			options = str(options).split('\n')
-		elif str(options).count(',') > 0:
-			options = str(options).split(',')
-		elif str(options).count(';') > 0:
-			options = str(options).split(';')
-		elif str(options).count(':') > 0:
-			options = str(options).split(':')
+		options = str(options)
+		if options.find('|') > 0:
+			options = options.split('|')
+		elif options.find('/') > 0:
+			options = options.split('/')
+		elif options.find(':') > 0:
+			options = options.split(':')
+		elif options.find(';') > 0:
+			options = options.split(';')
+		elif options.find(',') > 0:
+			options = options.split(',')
+		else:
+			options = options.split('\n')
 	if isinstance(options, list) and len(options) > 0:
-		return xbmcgui.Dialog().select(msg, options)
+		if default in options:
+			index = xbmcgui.Dialog().select(msg, options, preselect=options.index(default))
+		else:
+			index = xbmcgui.Dialog().select(msg, options)
+		if index >= 0:
+			return options[index]
+		else:
+			return None
 	else:
 		return None
 
@@ -445,9 +457,7 @@ def NumberInputDialog(title="Input", default=""):
 			msg = title
 	except:
 		msg = title
-	keyboard = xbmcgui.Dialog()
-	result = keyboard.numeric(0, msg, default)
-	return str(result)
+	return xbmcgui.Dialog().numeric(0, msg, default)
 
 
 # This function raises a keyboard date for user input
@@ -462,9 +472,7 @@ def DateInputDialog(title="Input", default=""):
 			msg = title
 	except:
 		msg = title
-	keyboard = xbmcgui.Dialog()
-	result = keyboard.numeric(1, msg, default)
-	return str(result)
+	return xbmcgui.Dialog().numeric(1, msg, default)
 
 
 # This function raises a keyboard time for user input
@@ -479,9 +487,7 @@ def TimeInputDialog(title="Input", default=""):
 			msg = title
 	except:
 		msg = title
-	keyboard = xbmcgui.Dialog()
-	result = keyboard.numeric(2, msg, default)
-	return str(result)
+	return xbmcgui.Dialog().numeric(2, msg, default)
 
 
 # This function raises a keyboard ipaddr for user input
@@ -496,9 +502,7 @@ def IPAddrInputDialog(title="Input", default=""):
 			msg = title
 	except:
 		msg = title
-	keyboard = xbmcgui.Dialog()
-	result = keyboard.numeric(3, msg, default)
-	return str(result)
+	return xbmcgui.Dialog().numeric(3, msg, default)
 
 
 # Run builtin command implemented for GUI
