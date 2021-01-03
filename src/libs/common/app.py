@@ -328,60 +328,28 @@ def AskRestart(msgid, s=0):
 			xbmc.executebuiltin("Reboot")
 
 
-def YesNoDialog(line1="", line2="", line3=""):
+def YesNoDialog(message):
 	try:
-		if isinstance(line1, int):
-			code = int(line1)
-			msg1 = translate(code)
+		if isinstance(message, int):
+			code = int(message)
+			message = translate(code)
 		else:
-			msg1 = line1
+			message = str(message)
 	except:
-		msg1 = line1
-	try:
-		if isinstance(line2, int):
-			code = int(line2)
-			msg2 = translate(code)
-		else:
-			msg2 = line2
-	except:
-		msg2 = line2
-	try:
-		if isinstance(line3, int):
-			code = int(line3)
-			msg3 = translate(code)
-		else:
-			msg3 = line3
-	except:
-		msg3 = line3
-	return xbmcgui.Dialog().yesno(AddonName(), line1=msg1, line2=msg2, line3=msg3)
+		message = str(message)
+	return xbmcgui.Dialog().yesno(AddonName(), message)
 
 
-def OkDialog(line1="", line2="", line3=""):
+def OkDialog(message):
 	try:
-		if isinstance(line1, int):
-			code = int(line1)
-			msg1 = translate(code)
+		if isinstance(message, int):
+			code = int(message)
+			message = translate(code)
 		else:
-			msg1 = line1
+			message = str(message)
 	except:
-		msg1 = line1
-	try:
-		if isinstance(line2, int):
-			code = int(line2)
-			msg2 = translate(code)
-		else:
-			msg2 = line2
-	except:
-		msg2 = line2
-	try:
-		if isinstance(line3, int):
-			code = int(line3)
-			msg3 = translate(code)
-		else:
-			msg3 = line3
-	except:
-		msg3 = line3
-	return xbmcgui.Dialog().ok(AddonName(), line1=msg1, line2=msg2, line3=msg3)
+		message = str(message)
+	return xbmcgui.Dialog().ok(AddonName(), message)
 
 
 # This functions displays select dialog
