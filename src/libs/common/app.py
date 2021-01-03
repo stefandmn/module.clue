@@ -353,7 +353,7 @@ def OkDialog(message):
 
 
 # This functions displays select dialog
-def SelectDialog(title="", default="", options=None):
+def SelectDialog(title="", default="", options=None, output='index'):
 	try:
 		if isinstance(title, int):
 			code = int(title)
@@ -381,10 +381,17 @@ def SelectDialog(title="", default="", options=None):
 	if isinstance(options, list) and len(options) > 0:
 		if default in options:
 			index = xbmcgui.Dialog().select(msg, options, preselect=options.index(default))
+			value = options[index] if index >= 0 else None
 		else:
 			index = xbmcgui.Dialog().select(msg, options)
-		if index >= 0:
-			return options[index]
+			value = options[index] if index >= 0 else None
+		output = output.lower() if output is not None else "index"
+		if output == "i" or output == 'index':
+			return index
+		elif output == "v" or output == 'value':
+			return value
+		elif output == "b" or output == 'both':
+			return (index, value)
 		else:
 			return None
 	else:
