@@ -234,7 +234,7 @@ def translate(id):
 	if _value is None or _value == '':
 		_value = xbmc.getLocalizedString(id)
 	if _value is not None and _value != '':
-		_value = common.utf8(_value)
+		_value = common.ustr(_value)
 	else:
 		_value = ''
 	return _value

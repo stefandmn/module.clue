@@ -8,6 +8,7 @@ import common
 import urllib3
 import certifi
 import subprocess
+import unicodedata
 import traceback
 
 if sys.version_info.major == 3:
@@ -141,22 +142,74 @@ def isempty(v):
 		elif isinstance(v, bool):
 			return v
 		else:
-			return False
+			if str(v) == '':
+				return True
+			else:
+				return False
 
 
-#Function utf8
-def utf8(value):
-	if value is not None:
-		if sys.version_info[0] == 2:
-			try:
-				return value.encode('utf-8', 'ignore')
-			except:
-				value = value.encode('ascii', 'ignore').decode('ascii', 'ignore')
-				return value.encode('utf-8', 'ignore')
-		else:
-			return str(value)
+def bstr(text):
+	"""
+	Converts any type of str text into a byte string value
+	:param text: input text to be converted
+	:return: byte str value
+	"""
+	if sys.version_info[0] == 2:
+		if isinstance(text, unicode):
+			text = text.encode('utf-8')
 	else:
-		return value
+		if isinstance(text, str):
+			text = text.encode('utf-8', 'ignore')
+	return text
+
+
+def ustr(text):
+	"""
+	Converts any type of str text into a unicode value
+	:param text: input text to be converted
+	:return: unicode str value
+	"""
+	if sys.version_info[0] == 2:
+		if isinstance(text, str):
+			text = unicode(text, "utf-8")
+	else:
+		if isinstance(text, bytes):
+			text = text.decode('utf-8', 'ignore')
+	return text
+
+
+def strstrip(text, u=True):
+	"""
+	Performs a trimming action to the input string, dropping all special characters.
+	The function works for both Python versions returning a byte str value
+	:param text: input text to be converted
+	:return: byte str value without special chars
+	"""
+	if sys.version_info[0] == 2:
+		if isinstance(text, str):
+			text = text.decode('ascii', 'ignore').encode('ascii')
+		elif isinstance(text, unicode):
+			text = text.encode('ascii', 'ignore')
+	else:
+		text = text.encode('ascii', 'ignore')
+	return ustr(text) if u else bstr(text)
+
+
+def strconvert(text, u=True):
+	"""
+	Performs a conversion action to the input string, tranform chans with accents or special
+	termination into standard ascii chars
+	:param text: input text to be converted
+	:return: unicode str value replacing special chars with standard chars
+	"""
+	if sys.version_info[0] == 2:
+		if isinstance(text, str):
+			text = unicode(text, "utf-8")
+	else:
+		if isinstance(text, bytes):
+			text = text.decode('utf-8', 'ignore')
+	text = unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode("utf-8")
+	return ustr(text) if u else bstr(text)
 
 
 # Function: procexec
