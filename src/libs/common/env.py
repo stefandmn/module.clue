@@ -226,11 +226,9 @@ def procexec(cmd):
 			_output = _output.strip()
 		common.trace("Command execution output: [%s] %s" % (str(_status), _output))
 	except subprocess.CalledProcessError as grepexc:
-		common.error("Exception while executing subprocess: [%s] %s" % (grepexc.returncode, grepexc.output), "procexec")
+		common.info("Unexpected exit code while executing subprocess: [%s] - %s" % (grepexc.returncode, grepexc.output), "procexec")
 		_status = False
 		_output = str(grepexc.output)
-		if common.istrace:
-			traceback.print_exc()
 	except BaseException as err:
 		common.error("Error while executing external process: %s" % str(err), "procexec")
 		_status = False
