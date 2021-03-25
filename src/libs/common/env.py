@@ -212,8 +212,14 @@ def strconvert(text, u=True):
 	return ustr(text) if u else bstr(text)
 
 
-# Function: procexec
 def procexec(cmd):
+	"""
+	Executes an operating system process to the file system  and shell level. The output
+	is capture and returned as tuples, containing status (usually obtained from $?
+	shell variable) and output value (standard output and/or error)
+	:param cmd:	shell command to be executed.
+	:return: tuples value with status and standard output
+	"""
 	try:
 		if isinstance(cmd, list):
 			common.debug("Preparing command for execution: %s" % (" ".join(cmd)), "procexec")
@@ -238,8 +244,14 @@ def procexec(cmd):
 	return _status, _output
 
 
-# Function: funcall
+
 def funcall(fnc, *args, **kwargs):
+	"""
+	Executes a function referred like a string that is published into a package
+	which is part of the running environment.
+	:param fnc:	function name
+	:return:	tuples value containing the status and the output of the called function
+	"""
 	common.debug("Calling function: %s" % fnc), "funcall"
 	try:
 		function = globals()[fnc]
@@ -256,8 +268,15 @@ def funcall(fnc, *args, **kwargs):
 	return _status, _output
 
 
-# Function: clscall
+
 def clscall(cls, mtd, *args, **kwargs):
+	"""
+	Executes a class method referred like strings that is published into a package
+	which is part of the running environment.
+	:param cls:	class name. could the name of the class of the instance
+	:param mtd:	method name
+	:return:	tuples value containing the status and the output of the called function
+	"""
 	try:
 		if isinstance(cls, str):
 			sig = type(cls, (), {})
@@ -279,9 +298,13 @@ def clscall(cls, mtd, *args, **kwargs):
 	return _status, _output
 
 
-# Function: sysinfo
 def sysinfo():
-	name = version = version_id = version_code = description = architecture = device  = ''
+	"""
+	Read system information details and return a dictionary with the following keys:
+	NAME, VERSION, ID, ID_LIKE, PRETTY_NAME, VERSION_ID, VERSION_CODE, HOME_URL,
+	BUILD_ID=, DEVICE, ARCH.
+	For more details please check CLue-2 project CCM process
+	"""
 	release_fields = re.compile(r'(?!#)(?P<key>.+)=(?P<quote>[\'\"]?)(?P<value>.+)(?P=quote)$')
 	release_unescape = re.compile(r'\\(?P<escaped>[\'\"\\])')
 	release_info = {}
@@ -295,27 +318,14 @@ def sysinfo():
 					release_info[key] = value
 	except OSError:
 		release_info = None
-	if release_info is not None:
-		if 'NAME' in release_info:
-			name = release_info['NAME']
-		if 'VERSION' in release_info:
-			version = release_info['VERSION']
-		if 'VERSION_ID' in release_info:
-			version_id = release_info['VERSION_ID']
-		if 'VERSION_CODE' in release_info:
-			version_code = release_info['VERSION_CODE']
-		if 'PRETTY_NAME' in release_info:
-			description = release_info['PRETTY_NAME']
-		if 'ARCH' in release_info:
-			architecture = release_info['ARCH']
-		if 'DEVICE' in release_info:
-			device = release_info['DEVICE']
-		return (name, version, version_id, version_code, description, architecture, device)
-	else:
-		return None
+	return release_info
 
 
 def getproxies():
+	"""
+	Get and merge the proxy configuration defined to the OS level and to Kodi level, over
+	Kodi graphical interface.
+	"""
 	global PROXIES
 	if PROXIES is None:
 		if common.any2bool(common.getSystemSetting("network.usehttpproxy"), none=False):
@@ -343,8 +353,28 @@ def getproxies():
 	return PROXIES
 
 
-# Function: urlcall
 def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout=None, retries=3, output=None, certver=None):
+	"""
+	Runs HTTP(s) calls with all type of methods , with input data in HTTP query format for GET
+	calls or using data pack prepared for POST call, and using various HTTP configurations (proxies,
+	custom headers, etc.)
+	:param url:		HTTP reference (URL) to be called
+	:param method:	HTTP method to be executed. BY default it has GET value, the possible values are:
+	GET, POST, PUT, PATCH,DELETE, HEAD
+	:param payload: HTTP query or data to be send to the server over POST method. THe data has to
+	be in dictionary format, providing the key and the corresponding value
+	:param proxies:	describes the proxy configuration (dictionary format)
+	:param timeout: indicates the HTTP connection timeout
+	:param retries:	in case the HTTP connection fails, the process will retry how many times is specified
+	by this parameter
+	:param output:	shows the data output format: the possible values could be: None (it returns the
+	original format, teext/string, bin/binary, json, response/original
+	:param certver: describes the certification authority or a local or referred keystore containing
+	certificate(s) to validate and trust the HTTPS (SSL) connection wit the target server.
+	:return: data content (test or binary) obtained by the call and HTTP method. IN case the value
+	is null might be the case to obtain an HTTP answer, other than 200 (the potential errors are
+	logged into the logging channel)
+	"""
 	common.debug("Calling URL: %s" %url, "urlcall")
 	# ssl validation
 	if certver is not None and isinstance(certver, bool) and certver is False:
@@ -426,12 +456,28 @@ def urlcall(url, method='GET', payload=None, headers=None, proxies=None, timeout
 
 
 def urlquote(text):
+	"""
+	Encode URLs or text content e.g. the path info, the query, etc., transforming the set of reserved
+	characters that must be quoted.
+	quote('abc def') -> 'abc%20def'
+	:param text: path info or queries
+	:return: quoted value
+	"""
 	return quote(text)
 
 
 def urlunquote(text):
+	"""
+	Reverse of 'urlquote'
+	unquote('abc%20def') -> 'abc def'
+	"""
 	return unquote(text)
 
 
 def urlparsequery(qs):
+	"""
+	Parse a query given as a string argument.
+	:param qs:	qs: percent-encoded query string to be parsed
+	:return: 	parsed query described like a list of tuples elements
+	"""
 	return parse_qsl(qs)
