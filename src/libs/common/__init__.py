@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__ = ['Addon', 'AddonId', 'AddonName', 'AddonIcon', 'AddonPath', 'AddonVersion', 'AddonProfile',
-		'trace', 'debug', 'info', 'notice', 'warn', 'error', 'istrace', 'isdebug', 'agent',
+		'trace', 'debug', 'info', 'notice', 'warn', 'error', 'istrace', 'isdebug', 'agent', 'mozilla_agent',
 		'translate', 'setting', 'setsetting', 'getAddonSetting', 'setAddonSetting', 'runBuiltinCommand',
 		'getSystemSetting', 'setSystemSetting', 'getSkinProperty', 'setSkinProperty', 'getSkinSetting', 'setSkinSetting',
 		'PasswordDialog', 'NotificationMsg', 'DlgNotificationMsg', 'AskRestart', 'YesNoDialog',
@@ -11,7 +11,7 @@ __all__ = ['Addon', 'AddonId', 'AddonName', 'AddonIcon', 'AddonPath', 'AddonVers
 		   'ustr', 'bstr', 'strconvert', 'strstrip', 'procexec', 'isempty',
 		'urlcall', 'funcall', 'clscall', 'sysinfo', 'callJSON', 'urlquote', 'urlunquote', 'urlparsequery']
 
-from .app import trace, debug, info, notice, warn, error, translate, setting, istrace, isdebug, agent
+from .app import trace, debug, info, notice, warn, error, translate, setting, istrace, isdebug, agent, mozilla_agent
 from .app import Addon, AddonId, AddonName, AddonIcon, AddonPath, AddonVersion, AddonProfile
 from .app import getAddonSetting, setAddonSetting, setsetting, runBuiltinCommand, getSystemSetting, setSystemSetting
 from .app import PasswordDialog, NotificationMsg, DlgNotificationMsg, AskRestart, YesNoDialog

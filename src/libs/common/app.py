@@ -104,6 +104,16 @@ def agent():
 	return xbmc.getUserAgent()
 
 
+def mozilla_agent():
+	"""
+	Provides fake HTTP user agent, taken for Kodi agent but reshaped for Mozilla.
+	:return: Mozilla user agent name aggregating many information about the system where the Kodi is running
+	"""
+	data = agent().split(" ")
+	data[0] = "Mozilla/5.0"
+	return " ".join(data)
+
+
 def log(txt, code="", level=0):
 	"""
 	INternal function to handle all type of logging
